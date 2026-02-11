@@ -1,0 +1,182 @@
+\documentclass{article}
+\usepackage{amsmath, amssymb, amsthm}
+
+\newtheorem{theorem}{Theorem}
+
+\begin{document}
+
+\section*{Multiple Testing and FCR Control}
+
+\subsection*{Setup}
+
+For each hypothesis $i = 1,\dots,m$, suppose we observe data
+\[
+Z_i \sim \mathcal{N}(\mu_i, \sigma_i^2),
+\]
+where $\sigma_i^2$ is known (or consistently estimated).
+
+We test
+\[
+H_{0,i}: \mu_i = 0.
+\]
+
+The usual two-sided $p$-value is
+\[
+P_i = 2\left(1 - \Phi\left(\frac{|Z_i|}{\sigma_i}\right)\right),
+\]
+where $\Phi$ is the standard normal CDF.
+
+A $(1-\alpha)$ confidence interval for $\mu_i$ is
+\[
+C_i(1-\alpha)
+=
+\left[
+Z_i - z_{1-\alpha/2}\sigma_i,
+\;
+Z_i + z_{1-\alpha/2}\sigma_i
+\right].
+\]
+
+\subsection*{Naive Procedure}
+
+\begin{enumerate}
+\item Apply the Benjamini–Hochberg (BH) procedure at level $q$ to $P_1,\dots,P_m$.
+\item Let $I \subset \{1,\dots,m\}$ be the set of discoveries.
+\item Report $C_i(1-\alpha)$ for each $i \in I$.
+\end{enumerate}
+
+\textbf{Problem:} This does not control the \emph{False Coverage Rate} (FCR), because intervals are constructed after selection.
+
+\subsection*{False Coverage Rate (FCR)}
+
+Let
+\[
+V = \#\{ i \in I : \mu_i \notin C_i \},
+\qquad
+R = |I|.
+\]
+
+Define the False Coverage Proportion (FCP) as
+\[
+\mathrm{FCP} =
+\begin{cases}
+\frac{V}{R}, & R > 0, \\
+0, & R = 0.
+\end{cases}
+\]
+
+The False Coverage Rate is
+\[
+\mathrm{FCR} = \mathbb{E}[\mathrm{FCP}]
+=
+\mathbb{E}\left[
+\frac{\#\{ i \in I : \mu_i \notin C_i \}}{\max(R,1)}
+\right].
+\]
+
+Goal: construct a procedure such that $\mathrm{FCR} \le \alpha$.
+
+\subsection*{FCR-Controlling Procedure}
+
+\begin{enumerate}
+\item Apply BH at level $q$ to obtain selected set $I$.
+\item Let $R = |I|$.
+\item For each $i \in I$, construct a confidence interval at level
+\[
+1 - \frac{qR}{m}.
+\]
+\end{enumerate}
+
+Thus the reported interval is
+\[
+C_i\left(1 - \frac{qR}{m}\right).
+\]
+
+\subsection*{Theorem (FCR Control)}
+
+\begin{theorem}
+Assume:
+\begin{enumerate}
+\item The data across $i=1,\dots,m$ are independent.
+\item For each $i$, $C_i(1-\alpha)$ is a valid $(1-\alpha)$ confidence interval for $\mu_i$.
+\item The intervals are constructed from data used in test $i$.
+\end{enumerate}
+Then the above procedure satisfies
+\[
+\mathrm{FCR} \le q.
+\]
+\end{theorem}
+
+\subsection*{Key Idea of Proof}
+
+Write
+\[
+\mathrm{FCR}
+=
+\mathbb{E}
+\left[
+\sum_{i=1}^m
+\frac{\mathbf{1}\{ i \in I, \mu_i \notin C_i(1 - qR/m)\}}
+{\max(R,1)}
+\right].
+\]
+
+Condition on all $p$-values except $P_i$.
+Under independence, the expected contribution from each $i$ is bounded by
+\[
+\frac{q}{m}.
+\]
+
+Summing over $i=1,\dots,m$ yields
+\[
+\mathrm{FCR} \le q.
+\]
+
+\subsection*{More General Framework}
+
+Suppose for each $i$ we have a nested family of valid confidence intervals
+\[
+C_i(1-\alpha_1) \subseteq C_i(1-\alpha_2)
+\quad \text{for } \alpha_1 < \alpha_2.
+\]
+
+Define
+\[
+P_i = \inf\{\alpha : 0 \notin C_i(1-\alpha)\}.
+\]
+
+Then applying BH to $P_1,\dots,P_m$ and reporting
+\[
+C_i\left(1 - \frac{qR}{m}\right)
+\]
+for selected $i$ controls FCR at level $q$.
+
+\subsection*{Connection to BH}
+
+The BH procedure selects the largest $k$ such that
+\[
+P_{(k)} \le \frac{qk}{m}.
+\]
+
+Equivalently, we want as many $p$-values as possible below their BH thresholds.
+
+After selection, confidence intervals are adjusted to match the BH threshold $\frac{qR}{m}$.
+
+\subsection*{Summary}
+
+Two main perspectives:
+
+\begin{enumerate}
+\item Given hypotheses $H_{0,i}$ and valid $p$-values $P_i$, control FDR using BH.
+\item Given parameters $\mu_i$ and valid confidence intervals $C_i(1-\alpha)$, adjust coverage after selection to control FCR.
+\end{enumerate}
+
+\subsection*{Additional Questions}
+
+\begin{itemize}
+\item How to incorporate prior information?
+\item How to handle streaming or online data?
+\item How to adjust for dependence across tests?
+\end{itemize}
+
+\end{document}
