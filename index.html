@@ -5,1789 +5,444 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Multiple Testing &amp; Modern Inference — STAT 27850</title>
 <link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,300;0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,400&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css">
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.js"></script>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/contrib/auto-render.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <style>
-:root {
-  --bg: #FAFAF7;
-  --bg-card: #FFFFFF;
-  --bg-code: #F4F3EF;
-  --text: #1A1A1A;
-  --text-secondary: #5A5A5A;
-  --text-muted: #8A8A8A;
-  --border: #E5E4DF;
-  --border-light: #EEEDEA;
-  --accent-blue: #2563EB;
-  --accent-blue-light: #EFF6FF;
-  --accent-red: #DC2626;
-  --accent-red-light: #FEF2F2;
-  --accent-green: #16A34A;
-  --accent-green-light: #F0FDF4;
-  --accent-amber: #D97706;
-  --accent-amber-light: #FFFBEB;
-  --accent-purple: #7C3AED;
-  --accent-purple-light: #F5F3FF;
-  --accent-teal: #0D9488;
-  --accent-teal-light: #F0FDFA;
-  --shadow-sm: 0 1px 2px rgba(0,0,0,0.04), 0 1px 4px rgba(0,0,0,0.03);
-  --shadow-md: 0 2px 8px rgba(0,0,0,0.06), 0 1px 4px rgba(0,0,0,0.04);
-  --shadow-lg: 0 4px 16px rgba(0,0,0,0.08), 0 2px 6px rgba(0,0,0,0.04);
-  --radius: 10px;
-  --radius-sm: 6px;
-}
-
-* { margin: 0; padding: 0; box-sizing: border-box; }
-
-body {
-  font-family: 'DM Sans', sans-serif;
-  background: var(--bg);
-  color: var(--text);
-  font-size: 15px;
-  line-height: 1.7;
-  -webkit-font-smoothing: antialiased;
-}
-
-h1, h2, h3, h4 {
-  font-family: 'Newsreader', serif;
-  font-weight: 500;
-  line-height: 1.25;
-}
-
-code, .mono {
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 0.88em;
-}
-
-/* ===== NAV ===== */
-nav {
-  position: sticky; top: 0; z-index: 100;
-  background: rgba(250,250,247,0.85);
-  backdrop-filter: blur(16px);
-  border-bottom: 1px solid var(--border);
-  padding: 0 24px;
-}
-nav .nav-inner {
-  max-width: 1200px; margin: 0 auto;
-  display: flex; align-items: center;
-  height: 52px; gap: 8px;
-  overflow-x: auto;
-}
-nav a {
-  text-decoration: none; color: var(--text-secondary);
-  font-size: 13px; font-weight: 500;
-  padding: 6px 12px; border-radius: 6px;
-  white-space: nowrap;
-  transition: all 0.15s;
-}
-nav a:hover { color: var(--text); background: rgba(0,0,0,0.04); }
-nav .brand {
-  font-family: 'Newsreader', serif;
-  font-weight: 600; color: var(--text);
-  font-size: 15px; margin-right: 12px;
-  letter-spacing: -0.01em;
-}
-
-/* ===== HERO ===== */
-.hero {
-  max-width: 820px; margin: 0 auto;
-  padding: 80px 24px 60px;
-  text-align: center;
-}
-.hero h1 {
-  font-size: clamp(32px, 5vw, 52px);
-  font-weight: 400;
-  letter-spacing: -0.02em;
-  margin-bottom: 16px;
-  color: var(--text);
-}
-.hero h1 em {
-  font-style: italic;
-  color: var(--accent-blue);
-}
-.hero p {
-  font-size: 17px;
-  color: var(--text-secondary);
-  max-width: 600px;
-  margin: 0 auto 32px;
-  line-height: 1.8;
-}
-.hero .tag-row {
-  display: flex; gap: 8px; justify-content: center; flex-wrap: wrap;
-}
-.tag {
-  display: inline-block;
-  padding: 5px 14px;
-  border-radius: 20px;
-  font-size: 12px;
-  font-weight: 500;
-  border: 1px solid var(--border);
-  color: var(--text-secondary);
-  background: var(--bg-card);
-}
-
-/* ===== SECTIONS ===== */
-.container {
-  max-width: 1080px;
-  margin: 0 auto;
-  padding: 0 24px;
-}
-
-section {
-  margin-bottom: 80px;
-}
-
-.section-label {
-  font-size: 11px;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.1em;
-  color: var(--text-muted);
-  margin-bottom: 8px;
-}
-
-section > h2 {
-  font-size: clamp(24px, 3.5vw, 34px);
-  margin-bottom: 12px;
-  letter-spacing: -0.015em;
-}
-
-section > .section-desc {
-  font-size: 15.5px;
-  color: var(--text-secondary);
-  max-width: 680px;
-  margin-bottom: 32px;
-  line-height: 1.75;
-}
-
-/* ===== CARDS ===== */
-.card {
-  background: var(--bg-card);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  padding: 28px;
-  box-shadow: var(--shadow-sm);
-  margin-bottom: 20px;
-}
-
-.card h3 {
-  font-size: 20px;
-  margin-bottom: 6px;
-}
-
-.card .subtitle {
-  font-size: 13px;
-  color: var(--text-muted);
-  margin-bottom: 16px;
-}
-
-.card p {
-  color: var(--text-secondary);
-  margin-bottom: 12px;
-}
-
-.formula-block {
-  background: var(--bg-code);
-  border: 1px solid var(--border-light);
-  border-radius: var(--radius-sm);
-  padding: 14px 18px;
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 13.5px;
-  color: var(--text);
-  margin: 14px 0;
-  overflow-x: auto;
-  line-height: 1.8;
-}
-
-.badge {
-  display: inline-block;
-  padding: 3px 10px;
-  border-radius: 4px;
-  font-size: 11px;
-  font-weight: 600;
-  margin-right: 6px;
-  margin-bottom: 6px;
-}
-.badge-fwer { background: var(--accent-blue-light); color: var(--accent-blue); }
-.badge-fdr { background: var(--accent-purple-light); color: var(--accent-purple); }
-.badge-indep { background: var(--accent-green-light); color: var(--accent-green); }
-.badge-any-dep { background: var(--accent-amber-light); color: var(--accent-amber); }
-.badge-prds { background: var(--accent-teal-light); color: var(--accent-teal); }
-.badge-pred { background: var(--accent-red-light); color: var(--accent-red); }
-
-/* ===== VIZ CONTAINERS ===== */
-.viz-container {
-  background: var(--bg-card);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  box-shadow: var(--shadow-md);
-  overflow: hidden;
-  margin-bottom: 24px;
-}
-
-.viz-header {
-  padding: 20px 24px 0;
-}
-.viz-header h3 {
-  font-size: 18px;
-  font-family: 'Newsreader', serif;
-  margin-bottom: 4px;
-}
-.viz-header p {
-  font-size: 13px;
-  color: var(--text-muted);
-  margin-bottom: 0;
-}
-
-.viz-controls {
-  padding: 16px 24px;
-  display: flex;
-  gap: 20px;
-  flex-wrap: wrap;
-  align-items: end;
-  border-bottom: 1px solid var(--border-light);
-}
-
-.control-group {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-  min-width: 140px;
-}
-.control-group label {
-  font-size: 11px;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
-  color: var(--text-muted);
-}
-.control-group input[type="range"] {
-  width: 100%;
-  accent-color: var(--accent-blue);
-}
-.control-group .val {
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 13px;
-  color: var(--accent-blue);
-  font-weight: 500;
-}
-
-.viz-body {
-  padding: 20px 24px 24px;
-  min-height: 300px;
-  position: relative;
-}
-
-.viz-body canvas {
-  width: 100% !important;
-  height: auto !important;
-}
-
-.viz-footer {
-  padding: 12px 24px 16px;
-  font-size: 12.5px;
-  color: var(--text-muted);
-  line-height: 1.6;
-  border-top: 1px solid var(--border-light);
-}
-
-/* ===== GRID LAYOUTS ===== */
-.grid-2 {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 20px;
-}
-.grid-3 {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 16px;
-}
-
-@media (max-width: 768px) {
-  .grid-2, .grid-3 { grid-template-columns: 1fr; }
-  .viz-controls { flex-direction: column; }
-}
-
-/* ===== COMPARISON TABLE ===== */
-.comparison-table {
-  width: 100%;
-  border-collapse: collapse;
-  font-size: 13.5px;
-  margin: 16px 0;
-}
-.comparison-table th {
-  text-align: left;
-  font-weight: 600;
-  font-size: 11px;
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
-  color: var(--text-muted);
-  padding: 10px 14px;
-  border-bottom: 2px solid var(--border);
-}
-.comparison-table td {
-  padding: 10px 14px;
-  border-bottom: 1px solid var(--border-light);
-  color: var(--text-secondary);
-  vertical-align: top;
-}
-.comparison-table tr:hover td {
-  background: rgba(0,0,0,0.015);
-}
-.comparison-table .method-name {
-  font-weight: 600;
-  color: var(--text);
-  font-family: 'Newsreader', serif;
-  font-size: 15px;
-}
-
-/* ===== DECISION FLOW ===== */
-.flow-node {
-  background: var(--bg-card);
-  border: 1.5px solid var(--border);
-  border-radius: var(--radius);
-  padding: 16px 20px;
-  text-align: center;
-  font-size: 14px;
-  transition: all 0.2s;
-  cursor: default;
-}
-.flow-node.question {
-  background: var(--accent-blue-light);
-  border-color: var(--accent-blue);
-  color: var(--accent-blue);
-  font-weight: 500;
-}
-.flow-node.answer {
-  font-family: 'Newsreader', serif;
-  font-size: 16px;
-  font-weight: 500;
-}
-.flow-arrow {
-  text-align: center;
-  color: var(--text-muted);
-  font-size: 20px;
-  padding: 6px 0;
-}
-.flow-label {
-  font-size: 12px;
-  font-weight: 600;
-  color: var(--text-muted);
-}
-.flow-row {
-  display: flex; gap: 16px; align-items: stretch;
-}
-.flow-row > * { flex: 1; }
-
-/* ===== LEGEND ===== */
-.legend {
-  display: flex;
-  gap: 16px;
-  flex-wrap: wrap;
-  margin: 10px 0;
-}
-.legend-item {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  font-size: 12px;
-  color: var(--text-secondary);
-}
-.legend-swatch {
-  width: 12px; height: 12px;
-  border-radius: 3px;
-}
-
-/* ===== STAT BOXES ===== */
-.stat-row {
-  display: flex; gap: 12px; flex-wrap: wrap;
-  margin: 12px 0;
-}
-.stat-box {
-  background: var(--bg-code);
-  border-radius: var(--radius-sm);
-  padding: 10px 16px;
-  min-width: 120px;
-}
-.stat-box .stat-label {
-  font-size: 10px;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-  color: var(--text-muted);
-}
-.stat-box .stat-value {
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 20px;
-  font-weight: 500;
-  color: var(--text);
-}
-
-/* ===== MISC ===== */
-.divider {
-  height: 1px;
-  background: var(--border);
-  margin: 60px 0;
-}
-
-.footnote {
-  font-size: 13px;
-  color: var(--text-muted);
-  margin-top: 40px;
-  padding-top: 20px;
-  border-top: 1px solid var(--border-light);
-  line-height: 1.7;
-}
-
-.highlight-box {
-  padding: 16px 20px;
-  border-radius: var(--radius-sm);
-  margin: 16px 0;
-  font-size: 14px;
-  line-height: 1.7;
-}
-.highlight-box.blue { background: var(--accent-blue-light); border-left: 3px solid var(--accent-blue); }
-.highlight-box.amber { background: var(--accent-amber-light); border-left: 3px solid var(--accent-amber); }
-.highlight-box.green { background: var(--accent-green-light); border-left: 3px solid var(--accent-green); }
-
-svg text { font-family: 'DM Sans', sans-serif; }
+:root{--bg:#FAFAF7;--bg-card:#FFF;--bg-code:#F4F3EF;--text:#1A1A1A;--text-sec:#5A5A5A;--text-mut:#8A8A8A;--bdr:#E5E4DF;--bdr-lt:#EEEDEA;--blue:#2563EB;--blue-lt:#EFF6FF;--red:#DC2626;--red-lt:#FEF2F2;--green:#16A34A;--green-lt:#F0FDF4;--amber:#D97706;--amber-lt:#FFFBEB;--purple:#7C3AED;--purple-lt:#F5F3FF;--teal:#0D9488;--teal-lt:#F0FDFA;--r:10px;--rs:6px}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);font-size:15px;line-height:1.7;-webkit-font-smoothing:antialiased}
+h1,h2,h3,h4{font-family:'Newsreader',serif;font-weight:500;line-height:1.25}
+code,.mono{font-family:'JetBrains Mono',monospace;font-size:.88em}
+nav{position:sticky;top:0;z-index:100;background:rgba(250,250,247,.88);backdrop-filter:blur(16px);border-bottom:1px solid var(--bdr);padding:0 24px}
+nav .ni{max-width:1200px;margin:0 auto;display:flex;align-items:center;height:52px;gap:8px;overflow-x:auto}
+nav a{text-decoration:none;color:var(--text-sec);font-size:13px;font-weight:500;padding:6px 12px;border-radius:6px;white-space:nowrap;transition:all .15s}
+nav a:hover{color:var(--text);background:rgba(0,0,0,.04)}
+nav .brand{font-family:'Newsreader',serif;font-weight:600;color:var(--text);font-size:15px;margin-right:12px}
+.hero{max-width:820px;margin:0 auto;padding:72px 24px 56px;text-align:center}
+.hero h1{font-size:clamp(30px,5vw,50px);font-weight:400;letter-spacing:-.02em;margin-bottom:14px}
+.hero h1 em{font-style:italic;color:var(--blue)}
+.hero p{font-size:16px;color:var(--text-sec);max-width:600px;margin:0 auto 28px;line-height:1.8}
+.hero .tr{display:flex;gap:8px;justify-content:center;flex-wrap:wrap}
+.tg{display:inline-block;padding:4px 13px;border-radius:20px;font-size:12px;font-weight:500;border:1px solid var(--bdr);color:var(--text-sec);background:var(--bg-card)}
+.ct{max-width:1080px;margin:0 auto;padding:0 24px}
+section{margin-bottom:72px}
+.sl{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.1em;color:var(--text-mut);margin-bottom:8px}
+section>h2{font-size:clamp(24px,3.5vw,34px);margin-bottom:10px;letter-spacing:-.015em}
+section>.sd{font-size:15.5px;color:var(--text-sec);max-width:680px;margin-bottom:28px;line-height:1.75}
+.card{background:var(--bg-card);border:1px solid var(--bdr);border-radius:var(--r);padding:24px;box-shadow:0 1px 2px rgba(0,0,0,.04);margin-bottom:16px}
+.card h3{font-size:19px;margin-bottom:4px}
+.card .sub{font-size:13px;color:var(--text-mut);margin-bottom:12px}
+.card p{color:var(--text-sec);margin-bottom:10px}
+.fb{background:var(--bg-code);border:1px solid var(--bdr-lt);border-radius:var(--rs);padding:16px 20px;margin:14px 0;overflow-x:auto;text-align:center;font-size:16px;line-height:2.2}
+.badge{display:inline-block;padding:3px 10px;border-radius:4px;font-size:11px;font-weight:600;margin-right:6px;margin-bottom:6px}
+.b-fwer{background:var(--blue-lt);color:var(--blue)}.b-fdr{background:var(--purple-lt);color:var(--purple)}.b-ind{background:var(--green-lt);color:var(--green)}.b-any{background:var(--amber-lt);color:var(--amber)}.b-prd{background:var(--teal-lt);color:var(--teal)}
+.vc{background:var(--bg-card);border:1px solid var(--bdr);border-radius:var(--r);box-shadow:0 2px 8px rgba(0,0,0,.06);overflow:hidden;margin-bottom:24px}
+.vh{padding:20px 24px 0}.vh h3{font-size:17px;margin-bottom:4px}.vh p{font-size:13px;color:var(--text-mut)}
+.vctrl{padding:14px 24px;display:flex;gap:18px;flex-wrap:wrap;align-items:end;border-bottom:1px solid var(--bdr-lt)}
+.cg{display:flex;flex-direction:column;gap:3px;min-width:130px}
+.cg label{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--text-mut)}
+.cg input[type=range]{width:100%;accent-color:var(--blue)}
+.cg .vl{font-family:'JetBrains Mono',monospace;font-size:13px;color:var(--blue);font-weight:500}
+.btn{padding:8px 16px;border-radius:6px;border:1px solid var(--blue);background:var(--blue);color:#fff;font-size:13px;font-weight:500;cursor:pointer;font-family:'DM Sans',sans-serif;margin-top:2px}
+.btn:hover{background:#1d4ed8}
+/* CRITICAL FIX: chart wrapper with explicit height, Chart.js uses maintainAspectRatio:false */
+.cw{position:relative;width:100%}
+.vb{padding:20px 24px 24px}
+.vf{padding:12px 24px 16px;font-size:12.5px;color:var(--text-mut);line-height:1.6;border-top:1px solid var(--bdr-lt)}
+.sr{display:flex;gap:10px;flex-wrap:wrap;margin:10px 0}
+.sb{background:var(--bg-code);border-radius:var(--rs);padding:8px 14px;min-width:110px}
+.sb .sl2{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.08em;color:var(--text-mut)}
+.sb .sv{font-family:'JetBrains Mono',monospace;font-size:18px;font-weight:500;color:var(--text)}
+.lg{display:flex;gap:14px;flex-wrap:wrap;margin:8px 0}
+.li{display:flex;align-items:center;gap:5px;font-size:12px;color:var(--text-sec)}
+.ls{width:12px;height:12px;border-radius:3px}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+@media(max-width:768px){.g2{grid-template-columns:1fr}.vctrl{flex-direction:column}}
+.ct2{width:100%;border-collapse:collapse;font-size:13.5px;margin:14px 0}
+.ct2 th{text-align:left;font-weight:600;font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--text-mut);padding:10px 14px;border-bottom:2px solid var(--bdr)}
+.ct2 td{padding:10px 14px;border-bottom:1px solid var(--bdr-lt);color:var(--text-sec);vertical-align:top}
+.ct2 tr:hover td{background:rgba(0,0,0,.015)}
+.ct2 .mn{font-weight:600;color:var(--text);font-family:'Newsreader',serif;font-size:15px}
+.fn{background:var(--bg-card);border:1.5px solid var(--bdr);border-radius:var(--r);padding:14px 18px;text-align:center;font-size:14px}
+.fn.q{background:var(--blue-lt);border-color:var(--blue);color:var(--blue);font-weight:500}
+.fn.a{font-family:'Newsreader',serif;font-size:15px;font-weight:500}
+.fl{font-size:12px;font-weight:600;color:var(--text-mut);text-align:center;padding:4px 0}
+.fr{display:flex;gap:14px;align-items:stretch}.fr>*{flex:1}
+.hb{padding:14px 18px;border-radius:var(--rs);margin:14px 0;font-size:14px;line-height:1.7}
+.hb.bl{background:var(--blue-lt);border-left:3px solid var(--blue)}
+.hb.am{background:var(--amber-lt);border-left:3px solid var(--amber)}
+.hb.gr{background:var(--green-lt);border-left:3px solid var(--green)}
+.foot{font-size:13px;color:var(--text-mut);margin-top:40px;padding-top:20px;border-top:1px solid var(--bdr-lt);line-height:1.7}
 </style>
 </head>
 <body>
-
-<nav>
-  <div class="nav-inner">
-    <a href="#" class="brand">STAT 27850</a>
-    <a href="#foundations">Foundations</a>
-    <a href="#global-null">Global Null Tests</a>
-    <a href="#multiple-testing">Multiple Testing</a>
-    <a href="#adaptive">Adaptive BH</a>
-    <a href="#permutation">Permutation Tests</a>
-    <a href="#selective">Selective Inference</a>
-    <a href="#conformal">Conformal Prediction</a>
-    <a href="#guide">Which Method?</a>
-  </div>
-</nav>
-
-<!-- ===== HERO ===== -->
+<nav><div class="ni">
+  <a href="#" class="brand">STAT 27850</a>
+  <a href="#foundations">Foundations</a>
+  <a href="#global-null">Global Null</a>
+  <a href="#mt">BH &amp; Holm</a>
+  <a href="#adaptive">Adaptive BH</a>
+  <a href="#perm">Permutation</a>
+  <a href="#sel">Selective &amp; Knockoffs</a>
+  <a href="#conf">Conformal</a>
+  <a href="#guide">Which Method?</a>
+</div></nav>
+ 
 <header class="hero">
   <h1>Multiple Testing &amp; <em>Modern Inference</em></h1>
-  <p>An interactive reference for the theory and practice of controlling error rates when testing many hypotheses, selecting models from data, and constructing prediction intervals — drawn from lecture notes for STAT 27850/30850, University of Chicago, Winter 2026.</p>
-  <div class="tag-row">
-    <span class="tag">FDR &amp; FWER Control</span>
-    <span class="tag">Benjamini–Hochberg</span>
-    <span class="tag">Permutation Tests</span>
-    <span class="tag">Conformal Prediction</span>
-    <span class="tag">Knockoffs</span>
-    <span class="tag">Post-Selection Inference</span>
+  <p>An interactive reference for controlling error rates when testing many hypotheses, selecting models from data, and constructing prediction intervals. From STAT 27850/30850, University of Chicago, Winter 2026.</p>
+  <div class="tr">
+    <span class="tg">FDR &amp; FWER</span><span class="tg">Benjamini–Hochberg</span><span class="tg">Permutation Tests</span><span class="tg">Conformal Prediction</span><span class="tg">Knockoffs</span><span class="tg">Selective Inference</span>
   </div>
 </header>
-
-<div class="container">
-
-<!-- ===================================================================== -->
-<!-- SECTION 1: FOUNDATIONS -->
-<!-- ===================================================================== -->
+ 
+<div class="ct">
+ 
 <section id="foundations">
-  <div class="section-label">Part I</div>
-  <h2>Foundations: P-values and Error Rates</h2>
-  <p class="section-desc">
-    Every method in this course rests on one idea: a valid p-value satisfies P(p ≤ t) ≤ t for all t ∈ [0,1] under the null — the <strong>super-uniform property</strong>. When many hypotheses are tested simultaneously, controlling the rate of false positives requires understanding how p-values behave collectively.
-  </p>
-
-  <div class="viz-container">
-    <div class="viz-header">
-      <h3>What do p-values look like?</h3>
-      <p>Under the null, valid p-values are uniform on [0,1]. When some alternatives are present, the p-value histogram develops excess mass near zero. Adjust the signal below to see the transition from "all null" to "sparse strong signals" to "dense weak signals."</p>
-    </div>
-    <div class="viz-controls">
-      <div class="control-group">
-        <label>Number of hypotheses (m)</label>
-        <input type="range" id="pval-m" min="50" max="2000" step="50" value="500">
-        <span class="val" id="pval-m-val">500</span>
-      </div>
-      <div class="control-group">
-        <label>Proportion non-null (1 − π₀)</label>
-        <input type="range" id="pval-pi" min="0" max="0.5" step="0.02" value="0.10">
-        <span class="val" id="pval-pi-val">0.10</span>
-      </div>
-      <div class="control-group">
-        <label>Signal strength (μ₁)</label>
-        <input type="range" id="pval-mu" min="0" max="5" step="0.1" value="3.0">
-        <span class="val" id="pval-mu-val">3.0</span>
-      </div>
-    </div>
-    <div class="viz-body">
-      <canvas id="pval-hist" height="260"></canvas>
-      <div class="stat-row" id="pval-stats"></div>
-    </div>
-    <div class="viz-footer">
-      <strong>How to read this:</strong> Under the global null (1 − π₀ = 0), the histogram is flat at height 1, and p-values below 0.05 make up roughly 5% of the total. As signals appear, a spike near zero emerges. With sparse strong signals (low 1−π₀, high μ₁), a few p-values are extremely small. With dense weak signals (high 1−π₀, low μ₁), the entire histogram tilts leftward but no individual p-value is very extreme.
-    </div>
+<div class="sl">Part I</div>
+<h2>Foundations: P-values and Error Rates</h2>
+<p class="sd">Every method rests on one idea: a valid p-value satisfies the <strong>super-uniform property</strong> \(\Pr_{H_0}(p \leq t) \leq t\) for all \(t\in[0,1]\). When many hypotheses are tested, controlling false positives requires understanding how p-values behave collectively.</p>
+ 
+<div class="vc">
+  <div class="vh"><h3>What Do P-values Look Like?</h3><p>Under the null, p-values are uniform. With alternatives present, the histogram develops excess mass near zero.</p></div>
+  <div class="vctrl">
+    <div class="cg"><label>Hypotheses (m)</label><input type="range" id="s1-m" min="100" max="2000" step="100" value="500"><span class="vl" id="s1-m-v">500</span></div>
+    <div class="cg"><label>Non-null (1−π₀)</label><input type="range" id="s1-pi" min="0" max="0.5" step="0.02" value="0.10"><span class="vl" id="s1-pi-v">0.10</span></div>
+    <div class="cg"><label>Signal (μ₁)</label><input type="range" id="s1-mu" min="0" max="5" step="0.1" value="3.0"><span class="vl" id="s1-mu-v">3.0</span></div>
   </div>
-
-  <div class="grid-2">
-    <div class="card">
-      <h3>FWER — Family-Wise Error Rate</h3>
-      <div class="formula-block">FWER = P(V ≥ 1)<br>= P(at least one false rejection)</div>
-      <p>The strictest criterion: control the probability that <em>any</em> true null is falsely rejected. Appropriate when even a single false positive is costly — e.g., clinical trials with regulatory consequences. Bonferroni and Holm control FWER.</p>
-    </div>
-    <div class="card">
-      <h3>FDR — False Discovery Rate</h3>
-      <div class="formula-block">FDR = E[V / max(R, 1)]<br>= expected proportion of false discoveries</div>
-      <p>A less conservative criterion that permits some false positives as long as they constitute a controlled fraction of all discoveries. Standard in genomics, neuroimaging, and other high-throughput sciences. Benjamini–Hochberg controls FDR.</p>
-    </div>
-  </div>
-
-  <div class="highlight-box amber">
-    <strong>Key distinction:</strong> When all nulls are true (m₀ = m), FDR reduces to FWER, because if any rejection occurs, the FDP is exactly 1. FDR is strictly less conservative than FWER only when some nulls are actually false.
-  </div>
-</section>
-
-<!-- ===================================================================== -->
-<!-- SECTION 2: GLOBAL NULL TESTS -->
-<!-- ===================================================================== -->
-<section id="global-null">
-  <div class="section-label">Part II</div>
-  <h2>Testing the Global Null</h2>
-  <p class="section-desc">
-    The first question in any multiple testing problem is: <em>is there any signal at all?</em> A global null test rejects H₀ = ∩ H₀,ᵢ — the hypothesis that every individual null is true — at level α. Three classical tests differ in their dependence assumptions and power profiles.
-  </p>
-
-  <div class="viz-container">
-    <div class="viz-header">
-      <h3>Bonferroni vs. Fisher vs. Simes — Live Comparison</h3>
-      <p>Each click generates new p-values and tests the global null with all three methods. Adjust the settings to see which tests reject under different signal regimes.</p>
-    </div>
-    <div class="viz-controls">
-      <div class="control-group">
-        <label>m (hypotheses)</label>
-        <input type="range" id="gn-m" min="5" max="200" step="5" value="20">
-        <span class="val" id="gn-m-val">20</span>
-      </div>
-      <div class="control-group">
-        <label>Signal proportion (1 − π₀)</label>
-        <input type="range" id="gn-prop" min="0" max="0.5" step="0.02" value="0.10">
-        <span class="val" id="gn-prop-val">0.10</span>
-      </div>
-      <div class="control-group">
-        <label>Signal strength (μ₁)</label>
-        <input type="range" id="gn-mu" min="0" max="5" step="0.2" value="3.0">
-        <span class="val" id="gn-mu-val">3.0</span>
-      </div>
-      <div class="control-group">
-        <label>α</label>
-        <input type="range" id="gn-alpha" min="0.01" max="0.20" step="0.01" value="0.05">
-        <span class="val" id="gn-alpha-val">0.05</span>
-      </div>
-      <div class="control-group">
-        <button id="gn-resim" style="padding:8px 18px;border-radius:6px;border:1px solid var(--accent-blue);background:var(--accent-blue);color:white;font-size:13px;font-weight:500;cursor:pointer;margin-top:2px;">↻ Resimulate</button>
-      </div>
-    </div>
-    <div class="viz-body">
-      <canvas id="gn-canvas" height="280"></canvas>
-      <div id="gn-results" class="stat-row" style="margin-top:14px;"></div>
-    </div>
-    <div class="viz-footer">
-      <strong>Intuition from the lecture notes:</strong> Bonferroni checks if the smallest p-value is ≤ α/m — it never needs independence but is conservative when p-values are correlated. Fisher sums −2 log(pᵢ) and compares to a χ²(2m) distribution — it accumulates evidence across many tests, making it powerful against dense, weak signals, but requires independence. Simes checks if any ordered p-value p<sub>(k)</sub> ≤ αk/m — it is exact under independence and valid under PRDS.
-    </div>
-  </div>
-
-  <table class="comparison-table">
-    <thead>
-      <tr><th>Method</th><th>Rule</th><th>Dependence Requirement</th><th>Best When</th></tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td class="method-name">Bonferroni</td>
-        <td><code>Reject if min(pᵢ) ≤ α/m</code></td>
-        <td><span class="badge badge-any-dep">Arbitrary</span></td>
-        <td>Safety is paramount; unknown correlation structure</td>
-      </tr>
-      <tr>
-        <td class="method-name">Fisher</td>
-        <td><code>Reject if −2Σlog(pᵢ) ≥ χ²₂ₘ,₁₋α</code></td>
-        <td><span class="badge badge-indep">Independence</span></td>
-        <td>Many weak signals; p-values are independent</td>
-      </tr>
-      <tr>
-        <td class="method-name">Simes</td>
-        <td><code>Reject if ∃k: p₍ₖ₎ ≤ αk/m</code></td>
-        <td><span class="badge badge-prds">Independence / PRDS</span></td>
-        <td>Sparse strong signals; moderate positive dependence</td>
-      </tr>
-    </tbody>
-  </table>
-
-  <div class="highlight-box blue">
-    <strong>A warning from Lecture 2:</strong> If you compute both Bonferroni and Fisher and report whichever one rejects, the combined Type I error can approach 2α. Fix: run each at α/2 and reject if either rejects. This is itself a multiple-testing correction — applied to the <em>procedures</em> rather than the hypotheses.
-  </div>
-</section>
-
-<!-- ===================================================================== -->
-<!-- SECTION 3: MULTIPLE TESTING PROCEDURES -->
-<!-- ===================================================================== -->
-<section id="multiple-testing">
-  <div class="section-label">Part III</div>
-  <h2>Multiple Testing Procedures</h2>
-  <p class="section-desc">
-    Moving from "is there any signal?" to "which hypotheses are non-null?" requires a procedure that maps p-values to a discovery set while controlling error. The two workhorses are Holm (FWER) and Benjamini–Hochberg (FDR). They differ fundamentally: Holm is step-down (stop at the first failure); BH is step-up (continue past failures as long as the largest threshold is met).
-  </p>
-
-  <div class="viz-container">
-    <div class="viz-header">
-      <h3>Step-Up vs. Step-Down: BH and Holm on the Same Data</h3>
-      <p>Ordered p-values are plotted against the BH threshold line (αk/m, blue) and Holm threshold line (α/(m+1−k), orange). Discoveries are marked where p-values fall below the thresholds.</p>
-    </div>
-    <div class="viz-controls">
-      <div class="control-group">
-        <label>m</label>
-        <input type="range" id="bh-m" min="10" max="100" step="5" value="40">
-        <span class="val" id="bh-m-val">40</span>
-      </div>
-      <div class="control-group">
-        <label>1 − π₀</label>
-        <input type="range" id="bh-pi" min="0" max="0.5" step="0.02" value="0.20">
-        <span class="val" id="bh-pi-val">0.20</span>
-      </div>
-      <div class="control-group">
-        <label>μ₁</label>
-        <input type="range" id="bh-mu" min="1" max="5" step="0.2" value="3.0">
-        <span class="val" id="bh-mu-val">3.0</span>
-      </div>
-      <div class="control-group">
-        <label>α (FDR / FWER level)</label>
-        <input type="range" id="bh-alpha" min="0.01" max="0.30" step="0.01" value="0.10">
-        <span class="val" id="bh-alpha-val">0.10</span>
-      </div>
-      <div class="control-group">
-        <button id="bh-resim" style="padding:8px 18px;border-radius:6px;border:1px solid var(--accent-blue);background:var(--accent-blue);color:white;font-size:13px;font-weight:500;cursor:pointer;">↻ Resimulate</button>
-      </div>
-    </div>
-    <div class="viz-body">
-      <canvas id="bh-canvas" height="320"></canvas>
-      <div class="legend" style="margin-top:8px;">
-        <div class="legend-item"><div class="legend-swatch" style="background:#2563EB;"></div>BH threshold (αk/m)</div>
-        <div class="legend-item"><div class="legend-swatch" style="background:#D97706;"></div>Holm threshold (α/(m+1−k))</div>
-        <div class="legend-item"><div class="legend-swatch" style="background:#16A34A;"></div>True non-null</div>
-        <div class="legend-item"><div class="legend-swatch" style="background:#DC2626;opacity:0.5;"></div>True null</div>
-      </div>
-      <div id="bh-results" class="stat-row" style="margin-top:8px;"></div>
-    </div>
-    <div class="viz-footer">
-      <strong>From Lectures 3–4:</strong> BH is a step-up procedure — "the more you reject, the more you can allow yourself to continue rejecting." Its threshold αk/m increases with k. Holm is step-down: thresholds α/(m+1−k) decrease, and a single failure to cross a threshold stops all further rejections. BH controls FDR ≤ α·m₀/m under independence; Holm controls FWER ≤ α under arbitrary dependence. When all nulls are true, BH reduces to the Simes global test.
-    </div>
-  </div>
-
-  <div class="viz-container">
-    <div class="viz-header">
-      <h3>BH vs. Bonferroni vs. Holm — Discovery Counts as m Grows</h3>
-      <p>How do the three procedures compare as the number of hypotheses increases? This simulation runs 200 repetitions at each value of m, fixing the non-null proportion and signal strength, and reports the average number of true and false discoveries.</p>
-    </div>
-    <div class="viz-controls">
-      <div class="control-group">
-        <label>1 − π₀</label>
-        <input type="range" id="mc-pi" min="0.05" max="0.40" step="0.05" value="0.15">
-        <span class="val" id="mc-pi-val">0.15</span>
-      </div>
-      <div class="control-group">
-        <label>μ₁</label>
-        <input type="range" id="mc-mu" min="2" max="5" step="0.5" value="3.0">
-        <span class="val" id="mc-mu-val">3.0</span>
-      </div>
-      <div class="control-group">
-        <button id="mc-run" style="padding:8px 18px;border-radius:6px;border:1px solid var(--accent-blue);background:var(--accent-blue);color:white;font-size:13px;font-weight:500;cursor:pointer;">▶ Run Simulation</button>
-      </div>
-    </div>
-    <div class="viz-body">
-      <canvas id="mc-canvas" height="300"></canvas>
-    </div>
-    <div class="viz-footer">
-      <strong>Key observation:</strong> As m grows, BH's FDR control lets it discover far more true signals than Holm or Bonferroni, which are constrained by FWER. The gap between BH's and Bonferroni's discovery counts widens with m — this is why FDR control became the standard in genomics and other large-scale settings.
-    </div>
-  </div>
-</section>
-
-<!-- ===================================================================== -->
-<!-- SECTION 4: ADAPTIVE BH -->
-<!-- ===================================================================== -->
-<section id="adaptive">
-  <div class="section-label">Part IV</div>
-  <h2>Adaptive BH &amp; Estimating π₀</h2>
-  <p class="section-desc">
-    Standard BH controls FDR at α·m₀/m, not at α. When many nulls are false (π₀ = m₀/m is small), BH is conservative and wastes power. The Storey estimator π̂₀ uses the flat right tail of the p-value histogram to estimate π₀, then inflates BH's threshold to α/π̂₀.
-  </p>
-
-  <div class="viz-container">
-    <div class="viz-header">
-      <h3>Storey's π₀ Estimator</h3>
-      <p>Choose a cutoff γ. P-values above γ are mostly from true nulls (which are uniform), so π̂₀(γ) = #{pᵢ > γ} / [m(1−γ)] estimates the null proportion. The dashed line shows π̂₀ as a function of γ on the current data.</p>
-    </div>
-    <div class="viz-controls">
-      <div class="control-group">
-        <label>m</label>
-        <input type="range" id="st-m" min="100" max="2000" step="100" value="1000">
-        <span class="val" id="st-m-val">1000</span>
-      </div>
-      <div class="control-group">
-        <label>True π₀</label>
-        <input type="range" id="st-pi" min="0.3" max="1.0" step="0.05" value="0.70">
-        <span class="val" id="st-pi-val">0.70</span>
-      </div>
-      <div class="control-group">
-        <label>μ₁</label>
-        <input type="range" id="st-mu" min="1.5" max="5" step="0.25" value="3.0">
-        <span class="val" id="st-mu-val">3.0</span>
-      </div>
-      <div class="control-group">
-        <label>γ cutoff</label>
-        <input type="range" id="st-gamma" min="0.1" max="0.9" step="0.05" value="0.50">
-        <span class="val" id="st-gamma-val">0.50</span>
-      </div>
-      <div class="control-group">
-        <button id="st-resim" style="padding:8px 18px;border-radius:6px;border:1px solid var(--accent-blue);background:var(--accent-blue);color:white;font-size:13px;font-weight:500;cursor:pointer;">↻ Resimulate</button>
-      </div>
-    </div>
-    <div class="viz-body">
-      <canvas id="st-canvas" height="280"></canvas>
-      <div id="st-results" class="stat-row" style="margin-top:10px;"></div>
-    </div>
-    <div class="viz-footer">
-      <strong>From Lecture 5:</strong> The adaptive BH procedure runs BH at level α/π̂₀. If π̂₀ < 1, the thresholds increase, yielding more discoveries. The +1 correction — π̂₀(γ) = (1 + #{pᵢ > γ}) / [m(1−γ)] — prevents π̂₀ from being zero, which would make α/π̂₀ blow up. A data-splitting variant uses p-values above γ <em>only</em> for estimation and p-values below γ <em>only</em> for rejection, restoring rigorous finite-sample FDR control.
-    </div>
-  </div>
-</section>
-
-<!-- ===================================================================== -->
-<!-- SECTION 5: PERMUTATION TESTS -->
-<!-- ===================================================================== -->
-<section id="permutation">
-  <div class="section-label">Part V</div>
-  <h2>Permutation &amp; Randomization Tests</h2>
-  <p class="section-desc">
-    When the null distribution of a test statistic is analytically intractable, permutation tests construct it empirically by exploiting exchangeability. Under the null, the observed statistic is just one of many equally likely values, and the permutation p-value is the rank of the observed statistic among its permuted counterparts.
-  </p>
-
-  <div class="viz-container">
-    <div class="viz-header">
-      <h3>Building the Null Distribution by Permutation</h3>
-      <p>We test whether X and Y are independent by computing a test statistic (correlation) on the original pairing, then repeatedly permuting the X-labels. The histogram shows the null distribution built from permutations, with the observed statistic marked.</p>
-    </div>
-    <div class="viz-controls">
-      <div class="control-group">
-        <label>n (sample size)</label>
-        <input type="range" id="perm-n" min="20" max="200" step="10" value="50">
-        <span class="val" id="perm-n-val">50</span>
-      </div>
-      <div class="control-group">
-        <label>True correlation (ρ)</label>
-        <input type="range" id="perm-rho" min="0" max="0.7" step="0.05" value="0.25">
-        <span class="val" id="perm-rho-val">0.25</span>
-      </div>
-      <div class="control-group">
-        <label>Permutations (M)</label>
-        <input type="range" id="perm-M" min="100" max="5000" step="100" value="1000">
-        <span class="val" id="perm-M-val">1000</span>
-      </div>
-      <div class="control-group">
-        <button id="perm-resim" style="padding:8px 18px;border-radius:6px;border:1px solid var(--accent-blue);background:var(--accent-blue);color:white;font-size:13px;font-weight:500;cursor:pointer;">↻ Run Test</button>
-      </div>
-    </div>
-    <div class="viz-body">
-      <canvas id="perm-canvas" height="260"></canvas>
-      <div id="perm-results" class="stat-row" style="margin-top:10px;"></div>
-    </div>
-    <div class="viz-footer">
-      <strong>From Lectures 7–8:</strong> The permutation p-value is p = (1 + #{T̃ᵦ ≥ T}) / (1 + M). The +1 in numerator and denominator ensures p is never zero and is always super-uniform under the null. Three canonical settings are covered: (1) both marginals known → simulate from the product distribution, (2) one marginal known → resample that variable, (3) neither known → permute labels. Conditional independence testing (H₀: X ⊥ Y | Z) is harder — local permutations within Z-clusters trade validity against power, and the curse of dimensionality makes this fundamentally difficult when Z is high-dimensional.
-    </div>
-  </div>
-</section>
-
-<!-- ===================================================================== -->
-<!-- SECTION 6: SELECTIVE INFERENCE & KNOCKOFFS -->
-<!-- ===================================================================== -->
-<section id="selective">
-  <div class="section-label">Part VI</div>
-  <h2>Selective Inference &amp; Knockoffs</h2>
-  <p class="section-desc">
-    When you choose which hypothesis to test <em>after</em> looking at the data — by selecting a model via Lasso, or by picking the largest estimated effect — classical p-values and confidence intervals are invalid. Selective inference conditions on the selection event; knockoffs use fake variables as negative controls.
-  </p>
-
-  <div class="grid-2">
-    <div class="card">
-      <h3>Post-Selection Inference</h3>
-      <div class="subtitle">Lectures 10–11</div>
-      <span class="badge badge-fwer">Conditional Coverage</span>
-      <p>The Lasso's KKT conditions imply that the event {selected model = (S, sign)} is a polyhedron {y : Ay ≤ b} in observation space. Conditional on this event, the distribution of any linear functional η<sup>⊤</sup>Y is a <strong>truncated Gaussian</strong>, from which valid p-values and confidence intervals can be derived.</p>
-      <div class="highlight-box blue" style="font-size:13px;">
-        <strong>Three correction strategies:</strong> (1) Data splitting — select on one half, infer on the other. Always valid, but wastes data. (2) Multiplicity correction — Bonferroni over all possible selections. Often too conservative. (3) Selective inference — condition on the polyhedral selection event. Exact, but computationally more involved.
-      </div>
-    </div>
-    <div class="card">
-      <h3>Model-X Knockoffs</h3>
-      <div class="subtitle">Lectures 14–15</div>
-      <span class="badge badge-fdr">FDR Control</span>
-      <p>Construct fake copies X̃₁,…,X̃ₚ of the covariates that are <strong>pairwise exchangeable</strong> with the originals: swapping Xⱼ and X̃ⱼ doesn't change the joint distribution. Null variables and their knockoffs are indistinguishable, so selected knockoffs serve as negative controls for estimating FDP.</p>
-      <div class="formula-block">
-        FDP̂(S) = #{j : X̃ⱼ ∈ S} / max(1, #{j : Xⱼ ∈ S})
-      </div>
-      <p>For Gaussian X ~ N(μ, Σ), the knockoff pair has covariance [Σ, Σ−D; Σ−D, Σ] for a diagonal D ≥ 0 making the matrix PSD. Conditional on max(Zⱼ, Z̃ⱼ), each null feature's "coin flip" — whether Xⱼ or X̃ⱼ has the larger importance — is an independent Bernoulli(1/2). This yields FDR control without independence of the test statistics.</p>
-    </div>
-  </div>
-</section>
-
-<!-- ===================================================================== -->
-<!-- SECTION 7: CONFORMAL PREDICTION -->
-<!-- ===================================================================== -->
-<section id="conformal">
-  <div class="section-label">Part VII</div>
-  <h2>Conformal Prediction</h2>
-  <p class="section-desc">
-    Conformal prediction constructs prediction intervals with <strong>distribution-free, finite-sample coverage guarantees</strong>. The only assumption is exchangeability of the data — no parametric model, no smoothness, no consistency of the underlying predictor. The quality of the model affects interval width, never validity.
-  </p>
-
-  <div class="viz-container">
-    <div class="viz-header">
-      <h3>Split Conformal Prediction — Interactive</h3>
-      <p>Data is generated from Y = f(X) + noise. A regression model is fit on the training set, and conformity scores |Yᵢ − f̂(Xᵢ)| are computed on the calibration set. The prediction interval at each test point is f̂(x) ± q̂, where q̂ is the (1−α)(1+1/n)-quantile of the calibration scores. Adjust model quality and noise level to see how intervals respond.</p>
-    </div>
-    <div class="viz-controls">
-      <div class="control-group">
-        <label>n (total data)</label>
-        <input type="range" id="cp-n" min="50" max="500" step="25" value="200">
-        <span class="val" id="cp-n-val">200</span>
-      </div>
-      <div class="control-group">
-        <label>Noise (σ)</label>
-        <input type="range" id="cp-noise" min="0.2" max="3" step="0.1" value="1.0">
-        <span class="val" id="cp-noise-val">1.0</span>
-      </div>
-      <div class="control-group">
-        <label>Model quality</label>
-        <input type="range" id="cp-quality" min="0" max="1" step="0.05" value="0.8">
-        <span class="val" id="cp-quality-val">0.80</span>
-      </div>
-      <div class="control-group">
-        <label>α (miscoverage)</label>
-        <input type="range" id="cp-alpha" min="0.01" max="0.30" step="0.01" value="0.10">
-        <span class="val" id="cp-alpha-val">0.10</span>
-      </div>
-      <div class="control-group">
-        <button id="cp-resim" style="padding:8px 18px;border-radius:6px;border:1px solid var(--accent-blue);background:var(--accent-blue);color:white;font-size:13px;font-weight:500;cursor:pointer;">↻ Resimulate</button>
-      </div>
-    </div>
-    <div class="viz-body">
-      <canvas id="cp-canvas" height="300"></canvas>
-      <div id="cp-results" class="stat-row" style="margin-top:10px;"></div>
-    </div>
-    <div class="viz-footer">
-      <strong>From Lectures 12–13, 16:</strong> Coverage P(Yₙ₊₁ ∈ C(Xₙ₊₁)) ≥ 1−α holds for any distribution, any algorithm. This is <em>marginal</em> coverage — averaged over all test points. <em>Conditional</em> coverage P(Yₙ₊₁ ∈ C(Xₙ₊₁) | Xₙ₊₁ = x) is generally impossible without stronger assumptions (a hardness result from Lecture 16). Conformalized Quantile Regression (CQR) achieves approximate conditional coverage by adapting interval widths to local heteroskedasticity.
-    </div>
-  </div>
-
-  <table class="comparison-table" style="margin-top:16px;">
-    <thead>
-      <tr><th>Variant</th><th>Idea</th><th>Coverage</th><th>Tradeoff</th></tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td class="method-name">Split Conformal</td>
-        <td>Train on one split, calibrate scores on another, predict with quantile of scores</td>
-        <td>≥ 1 − α (marginal)</td>
-        <td>Simple; wastes training data</td>
-      </tr>
-      <tr>
-        <td class="method-name">Jackknife+</td>
-        <td>Use all n leave-one-out models; tournament argument gives coverage</td>
-        <td>≥ 1 − 2α</td>
-        <td>Uses all data; fits n models; robust to instability</td>
-      </tr>
-      <tr>
-        <td class="method-name">Weighted Conformal</td>
-        <td>Importance weights dQ<sub>X</sub>/dP<sub>X</sub> for covariate shift</td>
-        <td>≈ 1 − α (conditional under shift)</td>
-        <td>Handles distribution shift; requires density ratio estimation</td>
-      </tr>
-      <tr>
-        <td class="method-name">CQR</td>
-        <td>Score = max(q̂<sub>α</sub>(x) − y, y − q̂<sub>1−α</sub>(x)); adapts to heteroskedasticity</td>
-        <td>≥ 1 − α marginal; ≈ 1 − α conditional if quantiles accurate</td>
-        <td>Best of both worlds when quantile model is good</td>
-      </tr>
-    </tbody>
-  </table>
-</section>
-
-<!-- ===================================================================== -->
-<!-- SECTION 8: DECISION GUIDE -->
-<!-- ===================================================================== -->
-<section id="guide">
-  <div class="section-label">Reference</div>
-  <h2>Which Method Should I Use?</h2>
-  <p class="section-desc">
-    The right choice depends on your goal, your assumptions about dependence, and the scale of your problem. This guide distills the decision logic from the full set of lecture notes.
-  </p>
-
-  <div class="viz-container" style="padding:28px;">
-    <div style="display:flex;flex-direction:column;gap:12px;">
-
-      <div class="flow-node question">What is your goal?</div>
-      <div class="flow-row">
-        <div style="display:flex;flex-direction:column;gap:10px;align-items:center;">
-          <div class="flow-label">Test a global null (any signal?)</div>
-          <div class="flow-node question" style="font-size:13px;">Are p-values independent?</div>
-          <div class="flow-row">
-            <div style="text-align:center;">
-              <div class="flow-label">Yes</div>
-              <div class="flow-node answer" style="border-color:var(--accent-green);">Simes (sparse) or Fisher (dense)</div>
-            </div>
-            <div style="text-align:center;">
-              <div class="flow-label">No / Unknown</div>
-              <div class="flow-node answer" style="border-color:var(--accent-amber);">Bonferroni<br><span style="font-size:12px;color:var(--text-muted);">(or Simes if PRDS holds)</span></div>
-            </div>
-          </div>
-        </div>
-
-        <div style="display:flex;flex-direction:column;gap:10px;align-items:center;">
-          <div class="flow-label">Identify which hypotheses (discoveries)</div>
-          <div class="flow-node question" style="font-size:13px;">Error criterion?</div>
-          <div class="flow-row">
-            <div style="text-align:center;">
-              <div class="flow-label">FWER</div>
-              <div class="flow-node answer" style="border-color:var(--accent-blue);">Holm–Bonferroni<br><span style="font-size:12px;color:var(--text-muted);">Any dependence</span></div>
-            </div>
-            <div style="text-align:center;">
-              <div class="flow-label">FDR</div>
-              <div class="flow-node answer" style="border-color:var(--accent-purple);">BH (indep/PRDS)<br>BY (arbitrary dep)<br><span style="font-size:12px;color:var(--text-muted);">Adaptive BH if π₀ ≪ 1</span></div>
-            </div>
-          </div>
-        </div>
-
-        <div style="display:flex;flex-direction:column;gap:10px;align-items:center;">
-          <div class="flow-label">Predict a future observation</div>
-          <div class="flow-node question" style="font-size:13px;">Assumptions?</div>
-          <div class="flow-row">
-            <div style="text-align:center;">
-              <div class="flow-label">Exchangeable data</div>
-              <div class="flow-node answer" style="border-color:var(--accent-teal);">Split Conformal<br><span style="font-size:12px;color:var(--text-muted);">Jackknife+ for efficiency</span></div>
-            </div>
-            <div style="text-align:center;">
-              <div class="flow-label">Distribution shift</div>
-              <div class="flow-node answer" style="border-color:var(--accent-red);">Weighted Conformal<br><span style="font-size:12px;color:var(--text-muted);">CQR for heteroskedasticity</span></div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div style="margin-top:16px;padding-top:16px;border-top:1px solid var(--border-light);">
-        <div class="flow-node question" style="max-width:400px;margin:0 auto;">Did you select which hypothesis to test using the data?</div>
-        <div class="flow-row" style="max-width:600px;margin:12px auto 0;">
-          <div style="text-align:center;">
-            <div class="flow-label">Yes — model selection (Lasso, stepwise)</div>
-            <div class="flow-node answer" style="border-color:var(--accent-red);">Selective inference / Data splitting / Knockoffs</div>
-          </div>
-          <div style="text-align:center;">
-            <div class="flow-label">No — pre-specified</div>
-            <div class="flow-node answer" style="border-color:var(--accent-green);">Standard procedures above apply directly</div>
-          </div>
-        </div>
-      </div>
-
-    </div>
-  </div>
-
-  <div class="highlight-box green" style="margin-top:20px;">
-    <strong>The unifying principle across all methods:</strong> Validity comes from respecting the relationship between what you looked at and what you claim. Bonferroni pays for looking at m hypotheses. BH pays proportionally to how many you reject. Selective inference pays for the specific model you chose. Conformal prediction pays nothing for model choice — but only guarantees marginal, not conditional, coverage. Every method in this course is a different way of accounting for the information the data has already revealed.
-  </div>
-</section>
-
-<div class="footnote">
-  <strong>STAT 27850 / 30850</strong> — Multiple Testing, Modern Inference, and Replicability · University of Chicago, Winter 2026<br>
-  Lecture notes by Patricia Ji. Interactive visualizations built for educational purposes.
+  <div class="vb"><div class="cw" style="height:220px"><canvas id="c1"></canvas></div><div class="sr" id="r1"></div></div>
+  <div class="vf"><strong>Reading:</strong> Flat at density 1 = all null. Spike near 0 = sparse strong signals. General leftward tilt = dense weak signals.</div>
 </div>
-
-</div><!-- end container -->
-
-<div style="height:60px;"></div>
-
-<!-- ===================================================================== -->
-<!-- SCRIPTS -->
-<!-- ===================================================================== -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+ 
+<div class="g2">
+  <div class="card"><h3>FWER</h3><div class="fb">$$\text{FWER} = \Pr(V \geq 1)$$</div><p>Probability that any true null is falsely rejected. Bonferroni and Holm control FWER.</p></div>
+  <div class="card"><h3>FDR</h3><div class="fb">$$\text{FDR} = \mathbb{E}\!\left[\frac{V}{\max(R,1)}\right]$$</div><p>Expected false discovery proportion. BH controls FDR. Standard in large-scale testing.</p></div>
+</div>
+<div class="hb am"><strong>Key:</strong> When all nulls are true (\(m_0=m\)), FDR = FWER. FDR is less conservative only when some nulls are actually false.</div>
+</section>
+ 
+<section id="global-null">
+<div class="sl">Part II</div>
+<h2>Testing the Global Null</h2>
+<p class="sd">Is there any signal? A global null test rejects \(H_{0,\text{global}}=\bigcap H_{0,i}\) at level \(\alpha\).</p>
+<div class="vc">
+  <div class="vh"><h3>Bonferroni vs. Fisher vs. Simes</h3><p>Ordered p-values plotted against Bonferroni (\(\alpha/m\)) and Simes (\(\alpha k/m\)) thresholds.</p></div>
+  <div class="vctrl">
+    <div class="cg"><label>m</label><input type="range" id="s2-m" min="5" max="100" step="5" value="20"><span class="vl" id="s2-m-v">20</span></div>
+    <div class="cg"><label>1−π₀</label><input type="range" id="s2-p" min="0" max="0.5" step="0.02" value="0.10"><span class="vl" id="s2-p-v">0.10</span></div>
+    <div class="cg"><label>μ₁</label><input type="range" id="s2-mu" min="0" max="5" step="0.2" value="3.0"><span class="vl" id="s2-mu-v">3.0</span></div>
+    <div class="cg"><label>α</label><input type="range" id="s2-a" min="0.01" max="0.20" step="0.01" value="0.05"><span class="vl" id="s2-a-v">0.05</span></div>
+    <div class="cg"><button class="btn" id="s2-b">↻ Resimulate</button></div>
+  </div>
+  <div class="vb"><div class="cw" style="height:230px"><canvas id="c2"></canvas></div><div class="sr" id="r2"></div></div>
+  <div class="vf"><strong>Lectures 1–2:</strong> Bonferroni: always valid, no independence needed. Fisher: \(-2\sum\log p_i \sim \chi^2_{2m}\), powerful for dense signals but requires independence. Simes: exact under independence, valid under PRDS, at most \(\alpha H_m\) anti-conservative otherwise.</div>
+</div>
+<table class="ct2"><thead><tr><th>Method</th><th>Rule</th><th>Dependence</th><th>Best when</th></tr></thead><tbody>
+<tr><td class="mn">Bonferroni</td><td>\(\min p_i \leq \alpha/m\)</td><td><span class="badge b-any">Arbitrary</span></td><td>Unknown dependence</td></tr>
+<tr><td class="mn">Fisher</td><td>\(-2\sum\log p_i \geq \chi^2_{2m,1-\alpha}\)</td><td><span class="badge b-ind">Independence</span></td><td>Many weak signals</td></tr>
+<tr><td class="mn">Simes</td><td>\(\exists k: p_{(k)} \leq \alpha k/m\)</td><td><span class="badge b-prd">Indep / PRDS</span></td><td>Sparse strong signals</td></tr>
+</tbody></table>
+</section>
+ 
+<section id="mt">
+<div class="sl">Part III</div>
+<h2>Multiple Testing: BH &amp; Holm</h2>
+<p class="sd">Holm (FWER) is step-down: stops at first failure. BH (FDR) is step-up: the more you reject, the more you allow. Their thresholds are \(\alpha/(m+1-k)\) and \(\alpha k/m\).</p>
+<div class="vc">
+  <div class="vh"><h3>BH vs. Holm — Same Data</h3><p>Ordered p-values vs. BH (blue) and Holm (amber) thresholds. Green dots = true non-null.</p></div>
+  <div class="vctrl">
+    <div class="cg"><label>m</label><input type="range" id="s3-m" min="10" max="80" step="5" value="40"><span class="vl" id="s3-m-v">40</span></div>
+    <div class="cg"><label>1−π₀</label><input type="range" id="s3-p" min="0.05" max="0.5" step="0.05" value="0.20"><span class="vl" id="s3-p-v">0.20</span></div>
+    <div class="cg"><label>μ₁</label><input type="range" id="s3-mu" min="1" max="5" step="0.2" value="3.0"><span class="vl" id="s3-mu-v">3.0</span></div>
+    <div class="cg"><label>α</label><input type="range" id="s3-a" min="0.01" max="0.30" step="0.01" value="0.10"><span class="vl" id="s3-a-v">0.10</span></div>
+    <div class="cg"><button class="btn" id="s3-b">↻ Resimulate</button></div>
+  </div>
+  <div class="vb"><div class="cw" style="height:260px"><canvas id="c3"></canvas></div>
+    <div class="lg">
+      <div class="li"><div class="ls" style="background:#2563EB"></div>BH \(\alpha k/m\)</div>
+      <div class="li"><div class="ls" style="background:#D97706"></div>Holm \(\alpha/(m\!+\!1\!-\!k)\)</div>
+      <div class="li"><div class="ls" style="background:#16A34A"></div>True non-null</div>
+      <div class="li"><div class="ls" style="background:rgba(220,38,38,.35)"></div>True null</div>
+    </div>
+    <div class="sr" id="r3"></div>
+  </div>
+  <div class="vf"><strong>Lectures 3–4:</strong> BH: \(\text{FDR}\leq\alpha m_0/m\) under independence/PRDS. Holm: \(\text{FWER}\leq\alpha\) always. BY adds harmonic penalty for arbitrary dependence. When all nulls true, BH = Simes test.</div>
+</div>
+<div class="vc">
+  <div class="vh"><h3>Discovery Power as m Grows</h3><p>Average true discoveries over 80 reps per m. Click Run to compute.</p></div>
+  <div class="vctrl">
+    <div class="cg"><label>1−π₀</label><input type="range" id="s4-p" min="0.05" max="0.40" step="0.05" value="0.15"><span class="vl" id="s4-p-v">0.15</span></div>
+    <div class="cg"><label>μ₁</label><input type="range" id="s4-mu" min="2" max="5" step="0.5" value="3.0"><span class="vl" id="s4-mu-v">3.0</span></div>
+    <div class="cg"><button class="btn" id="s4-b">▶ Run Simulation</button></div>
+  </div>
+  <div class="vb"><div class="cw" style="height:240px"><canvas id="c4"></canvas></div></div>
+  <div class="vf"><strong>Key:</strong> BH scales discoveries far beyond Holm/Bonferroni as m grows. This is why FDR control became standard in genomics.</div>
+</div>
+</section>
+ 
+<section id="adaptive">
+<div class="sl">Part IV</div>
+<h2>Adaptive BH &amp; Estimating \(\pi_0\)</h2>
+<p class="sd">BH controls FDR at \(\alpha m_0/m\), not \(\alpha\). Storey's estimator recovers the lost power.</p>
+<div class="vc">
+  <div class="vh"><h3>Storey's \(\hat\pi_0\) Estimator</h3><p>Amber bars (above \(\gamma\)) estimate \(\pi_0\). Blue bars (below \(\gamma\)) are rejection candidates.</p></div>
+  <div class="vctrl">
+    <div class="cg"><label>m</label><input type="range" id="s5-m" min="200" max="2000" step="200" value="1000"><span class="vl" id="s5-m-v">1000</span></div>
+    <div class="cg"><label>True π₀</label><input type="range" id="s5-pi" min="0.3" max="1.0" step="0.05" value="0.70"><span class="vl" id="s5-pi-v">0.70</span></div>
+    <div class="cg"><label>μ₁</label><input type="range" id="s5-mu" min="1.5" max="5" step="0.25" value="3.0"><span class="vl" id="s5-mu-v">3.0</span></div>
+    <div class="cg"><label>γ</label><input type="range" id="s5-g" min="0.1" max="0.9" step="0.05" value="0.50"><span class="vl" id="s5-g-v">0.50</span></div>
+    <div class="cg"><button class="btn" id="s5-b">↻ Resimulate</button></div>
+  </div>
+  <div class="vb"><div class="cw" style="height:220px"><canvas id="c5"></canvas></div><div class="sr" id="r5"></div></div>
+  <div class="vf"><strong>Lecture 5:</strong> \(\hat\pi_0(\gamma)=(1+\#\{p_i>\gamma\})/[m(1-\gamma)]\). Adaptive BH at \(\alpha/\hat\pi_0\). The +1 prevents division by zero.</div>
+</div>
+<div class="card"><h3>Formal statement</h3><div class="fb">$$\hat\pi_0(\gamma) = \frac{1 + \#\{i : p_i > \gamma\}}{m(1-\gamma)}, \qquad \text{Adaptive BH level:}\;\alpha' = \frac{\alpha}{\hat\pi_0(\gamma)}$$</div><p>Under independence, \(\mathbb{E}[\pi_0/\hat\pi_0]\leq 1\), yielding FDR \(\leq\alpha\). Under strong dependence (e.g. \(p_1=\cdots=p_m\)), this can fail.</p></div>
+</section>
+ 
+<section id="perm">
+<div class="sl">Part V</div>
+<h2>Permutation &amp; Randomization Tests</h2>
+<p class="sd">When the null distribution is intractable, permutation tests construct it via exchangeability. The p-value is the rank of the observed statistic among permuted counterparts.</p>
+<div class="vc">
+  <div class="vh"><h3>Permutation Test for Independence</h3><p>Permute X-labels M times. Red-shaded region = at least as extreme as observed.</p></div>
+  <div class="vctrl">
+    <div class="cg"><label>n</label><input type="range" id="s6-n" min="20" max="200" step="10" value="60"><span class="vl" id="s6-n-v">60</span></div>
+    <div class="cg"><label>True ρ</label><input type="range" id="s6-r" min="0" max="0.6" step="0.05" value="0.25"><span class="vl" id="s6-r-v">0.25</span></div>
+    <div class="cg"><label>M</label><input type="range" id="s6-M" min="200" max="3000" step="200" value="1000"><span class="vl" id="s6-M-v">1000</span></div>
+    <div class="cg"><button class="btn" id="s6-b">↻ Run Test</button></div>
+  </div>
+  <div class="vb"><div class="cw" style="height:210px"><canvas id="c6"></canvas></div><div class="sr" id="r6"></div></div>
+  <div class="vf"><strong>Lectures 7–8:</strong> \(p=(1+\#\{|\tilde T_b|\geq|T|\})/(1+M)\). The +1 ensures super-uniformity. Three settings: both marginals known, one known, neither known (permute). Conditional independence \(X\perp Y\mid Z\) requires local permutations within Z-clusters.</div>
+</div>
+</section>
+ 
+<section id="sel">
+<div class="sl">Part VI</div>
+<h2>Selective Inference &amp; Knockoffs</h2>
+<p class="sd">Choosing what to test after seeing data invalidates classical inference. Two modern fixes:</p>
+<div class="g2">
+  <div class="card"><h3>Post-Selection Inference</h3><div class="sub">Lectures 10–11</div><span class="badge b-fwer">Conditional Coverage</span>
+    <p>Lasso's selection event is a polyhedron \(\{y:Ay\leq b\}\). Conditional on it, \(\eta^\top Y\) follows a <strong>truncated Gaussian</strong>.</p>
+    <div class="fb">$$\hat\beta_S = (X_S^\top X_S)^{-1}(X_S^\top Y - \lambda\, t_S)$$</div>
+    <p>Three fixes: data splitting, Bonferroni over all selections, or conditioning on the polyhedral event.</p>
+  </div>
+  <div class="card"><h3>Model-X Knockoffs</h3><div class="sub">Lectures 14–15</div><span class="badge b-fdr">FDR Control</span>
+    <p>Construct pairwise-exchangeable fakes \(\tilde X_j\). Null variables and knockoffs are indistinguishable, so selected knockoffs are negative controls.</p>
+    <div class="fb">$$\widehat{\text{FDP}}(S) = \frac{\#\{j:\tilde X_j\in S\}}{\max(1,\,\#\{j:X_j\in S\})}$$</div>
+    <p>For \(X\sim N(\mu,\Sigma)\): augmented covariance \(\begin{pmatrix}\Sigma&\Sigma-D\\\Sigma-D&\Sigma\end{pmatrix}\). Each null coin flip is Bernoulli(1/2), giving FDR control without independence.</p>
+  </div>
+</div>
+</section>
+ 
+<section id="conf">
+<div class="sl">Part VII</div>
+<h2>Conformal Prediction</h2>
+<p class="sd">Distribution-free, finite-sample prediction intervals. Only assumption: exchangeability. Model quality affects width, never validity.</p>
+<div class="vc">
+  <div class="vh"><h3>Split Conformal Prediction</h3><p>Scores \(s_i=|Y_i-\hat f(X_i)|\) on calibration data. Interval: \(\hat f(x)\pm\hat q\). Green = covered, red = not.</p></div>
+  <div class="vctrl">
+    <div class="cg"><label>n</label><input type="range" id="s7-n" min="80" max="400" step="20" value="200"><span class="vl" id="s7-n-v">200</span></div>
+    <div class="cg"><label>Noise σ</label><input type="range" id="s7-s" min="0.3" max="3" step="0.1" value="1.0"><span class="vl" id="s7-s-v">1.0</span></div>
+    <div class="cg"><label>Model quality</label><input type="range" id="s7-q" min="0" max="1" step="0.05" value="0.80"><span class="vl" id="s7-q-v">0.80</span></div>
+    <div class="cg"><label>α</label><input type="range" id="s7-a" min="0.01" max="0.30" step="0.01" value="0.10"><span class="vl" id="s7-a-v">0.10</span></div>
+    <div class="cg"><button class="btn" id="s7-b">↻ Resimulate</button></div>
+  </div>
+  <div class="vb"><div class="cw" style="height:260px"><canvas id="c7"></canvas></div><div class="sr" id="r7"></div></div>
+  <div class="vf"><strong>Lectures 12–13, 16:</strong> \(P(Y_{n+1}\in C(X_{n+1}))\geq 1-\alpha\) for any distribution and any algorithm. This is marginal coverage. Conditional coverage is generally impossible (hardness result). CQR achieves approximate conditional coverage via quantile regression.</div>
+</div>
+<table class="ct2"><thead><tr><th>Variant</th><th>Idea</th><th>Coverage</th><th>Tradeoff</th></tr></thead><tbody>
+<tr><td class="mn">Split Conformal</td><td>Train/calibrate split</td><td>\(\geq 1-\alpha\) marginal</td><td>Simple; wastes data</td></tr>
+<tr><td class="mn">Jackknife+</td><td>All LOO models; tournament</td><td>\(\geq 1-2\alpha\)</td><td>Fits n models</td></tr>
+<tr><td class="mn">Weighted Conformal</td><td>Importance weights \(dQ_X/dP_X\)</td><td>Approx. conditional under shift</td><td>Needs density ratio</td></tr>
+<tr><td class="mn">CQR</td><td>Conformalized quantile regression</td><td>Marginal always; conditional if accurate</td><td>Best of both worlds</td></tr>
+</tbody></table>
+</section>
+ 
+<section id="guide">
+<div class="sl">Reference</div>
+<h2>Which Method Should I Use?</h2>
+<div class="vc" style="padding:24px">
+  <div style="display:flex;flex-direction:column;gap:12px">
+    <div class="fn q">What is your goal?</div>
+    <div class="fr">
+      <div style="display:flex;flex-direction:column;gap:8px;align-items:center">
+        <div class="fl">Global null test</div>
+        <div class="fn q" style="font-size:13px">Independent?</div>
+        <div class="fr"><div style="text-align:center"><div class="fl">Yes</div><div class="fn a" style="border-color:var(--green)">Simes / Fisher</div></div><div style="text-align:center"><div class="fl">No</div><div class="fn a" style="border-color:var(--amber)">Bonferroni</div></div></div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:8px;align-items:center">
+        <div class="fl">Identify which hypotheses</div>
+        <div class="fn q" style="font-size:13px">Error criterion?</div>
+        <div class="fr"><div style="text-align:center"><div class="fl">FWER</div><div class="fn a" style="border-color:var(--blue)">Holm</div></div><div style="text-align:center"><div class="fl">FDR</div><div class="fn a" style="border-color:var(--purple)">BH / BY / Adaptive</div></div></div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:8px;align-items:center">
+        <div class="fl">Prediction interval</div>
+        <div class="fn q" style="font-size:13px">Assumptions?</div>
+        <div class="fr"><div style="text-align:center"><div class="fl">Exchangeable</div><div class="fn a" style="border-color:var(--teal)">Conformal</div></div><div style="text-align:center"><div class="fl">Shift</div><div class="fn a" style="border-color:var(--red)">Weighted / CQR</div></div></div>
+      </div>
+    </div>
+    <div style="margin-top:14px;padding-top:14px;border-top:1px solid var(--bdr-lt)">
+      <div class="fn q" style="max-width:400px;margin:0 auto">Did you select what to test using the data?</div>
+      <div class="fr" style="max-width:520px;margin:10px auto 0"><div style="text-align:center"><div class="fl">Yes</div><div class="fn a" style="border-color:var(--red)">Selective inference / Knockoffs</div></div><div style="text-align:center"><div class="fl">No</div><div class="fn a" style="border-color:var(--green)">Standard procedures</div></div></div>
+    </div>
+  </div>
+</div>
+<div class="hb gr"><strong>Unifying principle:</strong> Validity comes from respecting what the data has already revealed. Bonferroni pays for \(m\) looks. BH pays proportionally to rejections. Selective inference pays for the model chosen. Conformal pays nothing for model choice — but only guarantees marginal coverage.</div>
+</section>
+ 
+<div class="foot"><strong>STAT 27850/30850</strong> — Multiple Testing, Modern Inference, and Replicability · University of Chicago, Winter 2026<br>Lecture notes by Patricia Ji.</div>
+</div>
+<div style="height:60px"></div>
+ 
 <script>
-// ===== UTILITIES =====
-function randn() {
-  let u = 0, v = 0;
-  while (u === 0) u = Math.random();
-  while (v === 0) v = Math.random();
-  return Math.sqrt(-2.0 * Math.log(u)) * Math.cos(2.0 * Math.PI * v);
-}
-
-function pvalFromZ(z) {
-  // two-sided p-value from standard normal
-  return 2 * (1 - normalCDF(Math.abs(z)));
-}
-
-function normalCDF(x) {
-  const a1 = 0.254829592, a2 = -0.284496736, a3 = 1.421413741, a4 = -1.453152027, a5 = 1.061405429;
-  const p = 0.3275911;
-  const sign = x < 0 ? -1 : 1;
-  x = Math.abs(x) / Math.sqrt(2);
-  const t = 1.0 / (1.0 + p * x);
-  const y = 1.0 - (((((a5 * t + a4) * t) + a3) * t + a2) * t + a1) * t * Math.exp(-x * x);
-  return 0.5 * (1.0 + sign * y);
-}
-
-function chi2CDF(x, k) {
-  // Regularized lower incomplete gamma function approximation
-  if (x <= 0) return 0;
-  return gammainc(k/2, x/2);
-}
-
-function gammainc(a, x) {
-  // Series expansion for regularized lower incomplete gamma
-  if (x < a + 1) {
-    let sum = 1/a, term = 1/a;
-    for (let n = 1; n < 200; n++) {
-      term *= x / (a + n);
-      sum += term;
-      if (Math.abs(term) < 1e-10) break;
-    }
-    return sum * Math.exp(-x + a * Math.log(x) - lgamma(a));
-  } else {
-    // continued fraction
-    let f = 1, c = 1, d = 1 / (x + 1 - a);
-    f = d;
-    for (let n = 1; n < 200; n++) {
-      const an = n * (a - n);
-      const bn = x + 2*n + 1 - a;
-      d = 1 / (bn + an * d);
-      c = bn + an / c;
-      const delta = c * d;
-      f *= delta;
-      if (Math.abs(delta - 1) < 1e-10) break;
-    }
-    return 1 - f * Math.exp(-x + a * Math.log(x) - lgamma(a));
-  }
-}
-
-function lgamma(x) {
-  const c = [76.18009172947146, -86.50532032941677, 24.01409824083091,
-    -1.231739572450155, 0.1208650973866179e-2, -0.5395239384953e-5];
-  let y = x, tmp = x + 5.5;
-  tmp -= (x + 0.5) * Math.log(tmp);
-  let ser = 1.000000000190015;
-  for (let j = 0; j < 6; j++) ser += c[j] / ++y;
-  return -tmp + Math.log(2.5066282746310005 * ser / x);
-}
-
-function generatePvals(m, pi0, mu) {
-  const pvals = [];
-  const isNull = [];
-  for (let i = 0; i < m; i++) {
-    const trueNull = Math.random() < pi0;
-    isNull.push(trueNull);
-    const z = trueNull ? randn() : randn() + mu;
-    pvals.push(pvalFromZ(z));
-  }
-  return { pvals, isNull };
-}
-
-function bindSlider(id, cb) {
-  const el = document.getElementById(id);
-  const valEl = document.getElementById(id + '-val');
-  const update = () => {
-    valEl.textContent = el.value;
-    if (cb) cb();
-  };
-  el.addEventListener('input', update);
-  return el;
-}
-
-const COLORS = {
-  blue: '#2563EB', blueLight: 'rgba(37,99,235,0.15)',
-  red: '#DC2626', redLight: 'rgba(220,38,38,0.15)',
-  green: '#16A34A', greenLight: 'rgba(22,163,74,0.15)',
-  amber: '#D97706', amberLight: 'rgba(217,119,6,0.15)',
-  purple: '#7C3AED', purpleLight: 'rgba(124,58,237,0.15)',
-  teal: '#0D9488',
-  gray: '#9CA3AF', grayLight: 'rgba(156,163,175,0.12)',
-};
-
-const chartDefaults = {
-  responsive: true,
-  maintainAspectRatio: false,
-  plugins: {
-    legend: { display: false },
-    tooltip: { enabled: true },
-  },
-  scales: {
-    x: { grid: { color: 'rgba(0,0,0,0.04)' }, ticks: { font: { family: "'DM Sans'" , size: 11 } } },
-    y: { grid: { color: 'rgba(0,0,0,0.04)' }, ticks: { font: { family: "'DM Sans'", size: 11 } } },
-  }
-};
-
-// ===================================================================
-// VIZ 1: P-VALUE HISTOGRAM
-// ===================================================================
-let pvalChart;
-function drawPvalHist() {
-  const m = +document.getElementById('pval-m').value;
-  const pi0 = 1 - +document.getElementById('pval-pi').value;
-  const mu = +document.getElementById('pval-mu').value;
-  const { pvals } = generatePvals(m, pi0, mu);
-
-  const nBins = 20;
-  const bins = new Array(nBins).fill(0);
-  pvals.forEach(p => {
-    const idx = Math.min(Math.floor(p * nBins), nBins - 1);
-    bins[idx]++;
-  });
-  const density = bins.map(b => b / m * nBins);
-  const labels = bins.map((_, i) => ((i + 0.5) / nBins).toFixed(2));
-
-  const barColors = bins.map((_, i) => {
-    const center = (i + 0.5) / nBins;
-    return center < 0.05 ? COLORS.blueLight : COLORS.grayLight;
-  });
-  const borderColors = bins.map((_, i) => {
-    const center = (i + 0.5) / nBins;
-    return center < 0.05 ? COLORS.blue : 'rgba(0,0,0,0.08)';
-  });
-
-  const ctx = document.getElementById('pval-hist').getContext('2d');
-  if (pvalChart) pvalChart.destroy();
-  pvalChart = new Chart(ctx, {
-    type: 'bar',
-    data: {
-      labels,
-      datasets: [{
-        data: density,
-        backgroundColor: barColors,
-        borderColor: borderColors,
-        borderWidth: 1,
-        borderRadius: 2,
-      }]
-    },
-    options: {
-      ...chartDefaults,
-      plugins: {
-        ...chartDefaults.plugins,
-        annotation: {}
-      },
-      scales: {
-        ...chartDefaults.scales,
-        x: { ...chartDefaults.scales.x, title: { display: true, text: 'p-value', font: { family: "'DM Sans'" } } },
-        y: {
-          ...chartDefaults.scales.y,
-          title: { display: true, text: 'Density', font: { family: "'DM Sans'" } },
-          suggestedMax: Math.max(2, ...density) * 1.1
-        }
-      }
-    }
-  });
-
-  const below05 = pvals.filter(p => p < 0.05).length;
-  const below01 = pvals.filter(p => p < 0.01).length;
-  document.getElementById('pval-stats').innerHTML = `
-    <div class="stat-box"><div class="stat-label">p &lt; 0.05</div><div class="stat-value">${below05} <span style="font-size:13px;color:var(--text-muted);">/ ${m}</span></div></div>
-    <div class="stat-box"><div class="stat-label">p &lt; 0.01</div><div class="stat-value">${below01} <span style="font-size:13px;color:var(--text-muted);">/ ${m}</span></div></div>
-    <div class="stat-box"><div class="stat-label">Expected (null)</div><div class="stat-value">${Math.round(m * 0.05)} <span style="font-size:13px;color:var(--text-muted);">at 5%</span></div></div>
-  `;
-}
-bindSlider('pval-m', drawPvalHist);
-bindSlider('pval-pi', drawPvalHist);
-bindSlider('pval-mu', drawPvalHist);
-drawPvalHist();
-
-// ===================================================================
-// VIZ 2: GLOBAL NULL TESTS
-// ===================================================================
-let gnChart;
-function drawGlobalNull() {
-  const m = +document.getElementById('gn-m').value;
-  const prop = +document.getElementById('gn-prop').value;
-  const mu = +document.getElementById('gn-mu').value;
-  const alpha = +document.getElementById('gn-alpha').value;
-  const pi0 = 1 - prop;
-  const { pvals, isNull } = generatePvals(m, pi0, mu);
-
-  const sorted = [...pvals].sort((a, b) => a - b);
-
-  // Bonferroni
-  const bonfReject = Math.min(...pvals) <= alpha / m;
-
-  // Fisher
-  const fisherStat = -2 * pvals.reduce((s, p) => s + Math.log(Math.max(p, 1e-300)), 0);
-  const fisherThresh = 2 * m; // approximate: mean of chi2(2m) is 2m
-  const fisherPval = 1 - chi2CDF(fisherStat, 2 * m);
-  const fisherReject = fisherPval <= alpha;
-
-  // Simes
-  let simesReject = false;
-  for (let k = 0; k < m; k++) {
-    if (sorted[k] <= alpha * (k + 1) / m) { simesReject = true; break; }
-  }
-
-  // Draw ordered p-values
-  const labels = sorted.map((_, i) => i + 1);
-  const ctx = document.getElementById('gn-canvas').getContext('2d');
-  if (gnChart) gnChart.destroy();
-
-  const bonfLine = sorted.map(() => alpha / m);
-  const simesLine = sorted.map((_, i) => alpha * (i + 1) / m);
-
-  gnChart = new Chart(ctx, {
-    type: 'scatter',
-    data: {
-      datasets: [
-        {
-          label: 'Ordered p-values',
-          data: sorted.map((p, i) => ({ x: i + 1, y: p })),
-          backgroundColor: sorted.map((p, i) => {
-            const origIdx = pvals.indexOf(p);
-            return isNull[origIdx >= 0 ? origIdx : 0] ? COLORS.redLight : COLORS.greenLight;
-          }),
-          borderColor: sorted.map((p, i) => {
-            return COLORS.gray;
-          }),
-          borderWidth: 0.5,
-          pointRadius: Math.max(2, Math.min(5, 200 / m)),
-        },
-        {
-          label: 'Bonferroni (α/m)',
-          data: labels.map(k => ({ x: k, y: alpha / m })),
-          type: 'line',
-          borderColor: COLORS.red,
-          borderWidth: 1.5,
-          borderDash: [6, 3],
-          pointRadius: 0,
-          fill: false,
-        },
-        {
-          label: 'Simes (αk/m)',
-          data: labels.map(k => ({ x: k, y: alpha * k / m })),
-          type: 'line',
-          borderColor: COLORS.purple,
-          borderWidth: 1.5,
-          borderDash: [3, 3],
-          pointRadius: 0,
-          fill: false,
-        }
-      ]
-    },
-    options: {
-      ...chartDefaults,
-      plugins: { legend: { display: true, position: 'top', labels: { font: { family: "'DM Sans'", size: 11 }, boxWidth: 14 } } },
-      scales: {
-        x: { ...chartDefaults.scales.x, title: { display: true, text: 'Rank k', font: { family: "'DM Sans'" } }, min: 0 },
-        y: { ...chartDefaults.scales.y, title: { display: true, text: 'p-value', font: { family: "'DM Sans'" } }, min: 0, max: Math.min(1, sorted[Math.min(m-1, Math.floor(m*0.5))] * 3 + 0.05) }
-      }
-    }
-  });
-
-  const mkResult = (name, reject, color) =>
-    `<div class="stat-box" style="border-left:3px solid ${color};"><div class="stat-label">${name}</div><div class="stat-value" style="color:${reject ? color : 'var(--text-muted)'};">${reject ? 'REJECT' : 'Fail to reject'}</div></div>`;
-  document.getElementById('gn-results').innerHTML =
-    mkResult('Bonferroni', bonfReject, COLORS.red) +
-    mkResult('Fisher', fisherReject, COLORS.amber) +
-    mkResult('Simes', simesReject, COLORS.purple);
-}
-bindSlider('gn-m', drawGlobalNull);
-bindSlider('gn-prop', drawGlobalNull);
-bindSlider('gn-mu', drawGlobalNull);
-bindSlider('gn-alpha', drawGlobalNull);
-document.getElementById('gn-resim').addEventListener('click', drawGlobalNull);
-drawGlobalNull();
-
-// ===================================================================
-// VIZ 3: BH vs HOLM
-// ===================================================================
-let bhChart;
-function drawBHvsHolm() {
-  const m = +document.getElementById('bh-m').value;
-  const pi0 = 1 - +document.getElementById('bh-pi').value;
-  const mu = +document.getElementById('bh-mu').value;
-  const alpha = +document.getElementById('bh-alpha').value;
-  const { pvals, isNull } = generatePvals(m, pi0, mu);
-
-  // Sort and track original indices
-  const indexed = pvals.map((p, i) => ({ p, i, isNull: isNull[i] })).sort((a, b) => a.p - b.p);
-
-  // BH: step-up
-  let bhK = 0;
-  for (let k = m; k >= 1; k--) {
-    if (indexed[k - 1].p <= alpha * k / m) { bhK = k; break; }
-  }
-
-  // Holm: step-down
-  let holmK = 0;
-  for (let k = 0; k < m; k++) {
-    if (indexed[k].p <= alpha / (m - k)) { holmK = k + 1; }
-    else break;
-  }
-
-  const bhThresh = indexed.map((_, k) => alpha * (k + 1) / m);
-  const holmThresh = indexed.map((_, k) => alpha / (m - k));
-
-  const ctx = document.getElementById('bh-canvas').getContext('2d');
-  if (bhChart) bhChart.destroy();
-  bhChart = new Chart(ctx, {
-    type: 'scatter',
-    data: {
-      datasets: [
-        {
-          label: 'p-values',
-          data: indexed.map((d, k) => ({ x: k + 1, y: d.p })),
-          backgroundColor: indexed.map((d, k) => {
-            const isBHdisc = k < bhK;
-            if (!d.isNull) return COLORS.green;
-            return isBHdisc ? COLORS.red : 'rgba(220,38,38,0.2)';
-          }),
-          pointRadius: Math.max(3, Math.min(6, 250 / m)),
-          borderWidth: 0,
-        },
-        {
-          label: 'BH: αk/m',
-          data: indexed.map((_, k) => ({ x: k + 1, y: bhThresh[k] })),
-          type: 'line', borderColor: COLORS.blue, borderWidth: 2, pointRadius: 0, fill: false,
-        },
-        {
-          label: 'Holm: α/(m+1−k)',
-          data: indexed.map((_, k) => ({ x: k + 1, y: holmThresh[k] })),
-          type: 'line', borderColor: COLORS.amber, borderWidth: 2, borderDash: [5, 3], pointRadius: 0, fill: false,
-        }
-      ]
-    },
-    options: {
-      ...chartDefaults,
-      plugins: { legend: { display: false } },
-      scales: {
-        x: { ...chartDefaults.scales.x, title: { display: true, text: 'Rank k', font: { family: "'DM Sans'" } } },
-        y: {
-          ...chartDefaults.scales.y,
-          title: { display: true, text: 'p-value', font: { family: "'DM Sans'" } },
-          min: 0,
-          max: Math.min(1, Math.max(alpha * 1.5, indexed[Math.min(m - 1, Math.floor(m * 0.3))].p * 2))
-        }
-      }
-    }
-  });
-
-  // Stats
-  const bhFalse = indexed.slice(0, bhK).filter(d => d.isNull).length;
-  const bhTrue = bhK - bhFalse;
-  const holmFalse = indexed.slice(0, holmK).filter(d => d.isNull).length;
-  const holmTrue = holmK - holmFalse;
-  const totalNonNull = isNull.filter(x => !x).length;
-
-  document.getElementById('bh-results').innerHTML = `
-    <div class="stat-box" style="border-left:3px solid ${COLORS.blue};"><div class="stat-label">BH Discoveries</div><div class="stat-value">${bhK} <span style="font-size:12px;color:var(--text-muted);">(${bhTrue} true, ${bhFalse} false)</span></div></div>
-    <div class="stat-box" style="border-left:3px solid ${COLORS.amber};"><div class="stat-label">Holm Discoveries</div><div class="stat-value">${holmK} <span style="font-size:12px;color:var(--text-muted);">(${holmTrue} true, ${holmFalse} false)</span></div></div>
-    <div class="stat-box"><div class="stat-label">True Non-nulls</div><div class="stat-value">${totalNonNull} <span style="font-size:12px;color:var(--text-muted);">/ ${m}</span></div></div>
-    <div class="stat-box"><div class="stat-label">Realized FDP (BH)</div><div class="stat-value">${bhK > 0 ? (bhFalse / bhK).toFixed(3) : '—'}</div></div>
-  `;
-}
-bindSlider('bh-m', drawBHvsHolm);
-bindSlider('bh-pi', drawBHvsHolm);
-bindSlider('bh-mu', drawBHvsHolm);
-bindSlider('bh-alpha', drawBHvsHolm);
-document.getElementById('bh-resim').addEventListener('click', drawBHvsHolm);
-drawBHvsHolm();
-
-// ===================================================================
-// VIZ 4: MONTE CARLO — DISCOVERY COUNTS VS M
-// ===================================================================
-let mcChart;
-function runMonteCarlo() {
-  const pi0 = 1 - +document.getElementById('mc-pi').value;
-  const mu = +document.getElementById('mc-mu').value;
-  const alpha = 0.10;
-  const mValues = [10, 20, 50, 100, 200, 500];
-  const nReps = 150;
-
-  const bhTrue = [], bhFalse = [], holmTrue = [], holmFalse = [], bonfTrue = [], bonfFalse = [];
-
-  for (const m of mValues) {
-    let btSum = 0, bfSum = 0, htSum = 0, hfSum = 0, bntSum = 0, bnfSum = 0;
-    for (let r = 0; r < nReps; r++) {
-      const { pvals, isNull } = generatePvals(m, pi0, mu);
-      const indexed = pvals.map((p, i) => ({ p, i, isNull: isNull[i] })).sort((a, b) => a.p - b.p);
-
-      // BH
-      let bhK = 0;
-      for (let k = m; k >= 1; k--) { if (indexed[k-1].p <= alpha * k / m) { bhK = k; break; } }
-      btSum += indexed.slice(0, bhK).filter(d => !d.isNull).length;
-      bfSum += indexed.slice(0, bhK).filter(d => d.isNull).length;
-
-      // Holm
-      let hK = 0;
-      for (let k = 0; k < m; k++) { if (indexed[k].p <= alpha / (m - k)) hK = k + 1; else break; }
-      htSum += indexed.slice(0, hK).filter(d => !d.isNull).length;
-      hfSum += indexed.slice(0, hK).filter(d => d.isNull).length;
-
-      // Bonferroni
-      const bK = pvals.filter(p => p <= alpha / m).length;
-      const bfDisc = pvals.map((p, i) => ({ p, isNull: isNull[i] })).filter(d => d.p <= alpha / m);
-      bntSum += bfDisc.filter(d => !d.isNull).length;
-      bnfSum += bfDisc.filter(d => d.isNull).length;
-    }
-    bhTrue.push(btSum / nReps); bhFalse.push(bfSum / nReps);
-    holmTrue.push(htSum / nReps); holmFalse.push(hfSum / nReps);
-    bonfTrue.push(bntSum / nReps); bonfFalse.push(bnfSum / nReps);
-  }
-
-  const ctx = document.getElementById('mc-canvas').getContext('2d');
-  if (mcChart) mcChart.destroy();
-  mcChart = new Chart(ctx, {
-    type: 'line',
-    data: {
-      labels: mValues,
-      datasets: [
-        { label: 'BH — true discoveries', data: bhTrue, borderColor: COLORS.blue, backgroundColor: COLORS.blueLight, borderWidth: 2.5, pointRadius: 4, fill: false, tension: 0.3 },
-        { label: 'Holm — true discoveries', data: holmTrue, borderColor: COLORS.amber, backgroundColor: COLORS.amberLight, borderWidth: 2.5, pointRadius: 4, fill: false, tension: 0.3 },
-        { label: 'Bonferroni — true discoveries', data: bonfTrue, borderColor: COLORS.red, backgroundColor: COLORS.redLight, borderWidth: 2, pointRadius: 4, borderDash: [5,3], fill: false, tension: 0.3 },
-        { label: 'BH — false discoveries', data: bhFalse, borderColor: COLORS.blue, borderWidth: 1.5, pointRadius: 3, borderDash: [2,2], fill: false, tension: 0.3 },
-      ]
-    },
-    options: {
-      ...chartDefaults,
-      plugins: { legend: { display: true, position: 'top', labels: { font: { family: "'DM Sans'", size: 11 }, boxWidth: 14, padding: 12 } } },
-      scales: {
-        x: { ...chartDefaults.scales.x, title: { display: true, text: 'Number of hypotheses (m)', font: { family: "'DM Sans'" } }, type: 'logarithmic' },
-        y: { ...chartDefaults.scales.y, title: { display: true, text: 'Average discoveries', font: { family: "'DM Sans'" } }, beginAtZero: true }
-      }
-    }
-  });
-}
-bindSlider('mc-pi', () => {});
-bindSlider('mc-mu', () => {});
-document.getElementById('mc-run').addEventListener('click', runMonteCarlo);
-runMonteCarlo();
-
-// ===================================================================
-// VIZ 5: STOREY π₀ ESTIMATOR
-// ===================================================================
-let stChart;
-function drawStorey() {
-  const m = +document.getElementById('st-m').value;
-  const truePi0 = +document.getElementById('st-pi').value;
-  const mu = +document.getElementById('st-mu').value;
-  const gamma = +document.getElementById('st-gamma').value;
-  const { pvals } = generatePvals(m, truePi0, mu);
-
-  // Histogram
-  const nBins = 25;
-  const bins = new Array(nBins).fill(0);
-  pvals.forEach(p => { const idx = Math.min(Math.floor(p * nBins), nBins - 1); bins[idx]++; });
-  const density = bins.map(b => b / m * nBins);
-
-  // Storey estimator at the chosen gamma
-  const aboveGamma = pvals.filter(p => p > gamma).length;
-  const pi0Hat = (1 + aboveGamma) / (m * (1 - gamma));
-
-  // π₀ estimates at various gamma
-  const gammas = [];
-  const pi0Hats = [];
-  for (let g = 0.05; g <= 0.95; g += 0.05) {
-    gammas.push(g.toFixed(2));
-    const above = pvals.filter(p => p > g).length;
-    pi0Hats.push(Math.min(1.5, (1 + above) / (m * (1 - g))));
-  }
-
-  const ctx = document.getElementById('st-canvas').getContext('2d');
-  if (stChart) stChart.destroy();
-
-  const barColors = bins.map((_, i) => {
-    const binRight = (i + 1) / nBins;
-    return binRight > gamma ? COLORS.amberLight : COLORS.blueLight;
-  });
-  const barBorders = bins.map((_, i) => {
-    const binRight = (i + 1) / nBins;
-    return binRight > gamma ? COLORS.amber : COLORS.blue;
-  });
-
-  stChart = new Chart(ctx, {
-    type: 'bar',
-    data: {
-      labels: bins.map((_, i) => ((i + 0.5) / nBins).toFixed(2)),
-      datasets: [
-        {
-          label: 'p-value density',
-          data: density,
-          backgroundColor: barColors,
-          borderColor: barBorders,
-          borderWidth: 1,
-          borderRadius: 2,
-          yAxisID: 'y',
-        }
-      ]
-    },
-    options: {
-      ...chartDefaults,
-      plugins: { legend: { display: false } },
-      scales: {
-        x: { ...chartDefaults.scales.x, title: { display: true, text: 'p-value', font: { family: "'DM Sans'" } } },
-        y: { ...chartDefaults.scales.y, title: { display: true, text: 'Density', font: { family: "'DM Sans'" } }, position: 'left' },
-      }
-    }
-  });
-
-  // BH discoveries
-  const alpha = 0.10;
-  const sorted = [...pvals].sort((a, b) => a - b);
-  let bhK = 0;
-  for (let k = m; k >= 1; k--) { if (sorted[k-1] <= alpha * k / m) { bhK = k; break; } }
-  let abhK = 0;
-  const adjAlpha = Math.min(alpha / Math.min(pi0Hat, 1), 1);
-  for (let k = m; k >= 1; k--) { if (sorted[k-1] <= adjAlpha * k / m) { abhK = k; break; } }
-
-  document.getElementById('st-results').innerHTML = `
-    <div class="stat-box"><div class="stat-label">True π₀</div><div class="stat-value">${truePi0.toFixed(2)}</div></div>
-    <div class="stat-box" style="border-left:3px solid ${COLORS.amber};"><div class="stat-label">π̂₀ at γ=${gamma.toFixed(2)}</div><div class="stat-value">${pi0Hat.toFixed(3)}</div></div>
-    <div class="stat-box" style="border-left:3px solid ${COLORS.blue};"><div class="stat-label">BH Discoveries (α=0.10)</div><div class="stat-value">${bhK}</div></div>
-    <div class="stat-box" style="border-left:3px solid ${COLORS.green};"><div class="stat-label">Adaptive BH Discoveries</div><div class="stat-value">${abhK}</div></div>
-    <div class="stat-box"><div class="stat-label">Power Gain</div><div class="stat-value">${bhK > 0 ? '+' + (abhK - bhK) : '—'}</div></div>
-  `;
-}
-bindSlider('st-m', drawStorey);
-bindSlider('st-pi', drawStorey);
-bindSlider('st-mu', drawStorey);
-bindSlider('st-gamma', drawStorey);
-document.getElementById('st-resim').addEventListener('click', drawStorey);
-drawStorey();
-
-// ===================================================================
-// VIZ 6: PERMUTATION TEST
-// ===================================================================
-let permChart;
-function drawPermutation() {
-  const n = +document.getElementById('perm-n').value;
-  const rho = +document.getElementById('perm-rho').value;
-  const M = +document.getElementById('perm-M').value;
-
-  // Generate correlated (X, Y)
-  const X = [], Y = [];
-  for (let i = 0; i < n; i++) {
-    const x = randn();
-    const y = rho * x + Math.sqrt(1 - rho * rho) * randn();
-    X.push(x); Y.push(y);
-  }
-
-  // Observed correlation
-  const mx = X.reduce((s, v) => s + v, 0) / n;
-  const my = Y.reduce((s, v) => s + v, 0) / n;
-  const corrObs = X.reduce((s, v, i) => s + (v - mx) * (Y[i] - my), 0) /
-    Math.sqrt(X.reduce((s, v) => s + (v - mx) ** 2, 0) * Y.reduce((s, v) => s + (v - my) ** 2, 0));
-
-  // Permutation null distribution
-  const permCorrs = [];
-  for (let b = 0; b < M; b++) {
-    // Fisher-Yates shuffle of X indices
-    const perm = [...Array(n).keys()];
-    for (let i = n - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1));
-      [perm[i], perm[j]] = [perm[j], perm[i]];
-    }
-    const mxp = X.reduce((s, v) => s + v, 0) / n;
-    const c = perm.reduce((s, pi, i) => s + (X[pi] - mxp) * (Y[i] - my), 0) /
-      Math.sqrt(X.reduce((s, v) => s + (v - mx) ** 2, 0) * Y.reduce((s, v) => s + (v - my) ** 2, 0));
-    permCorrs.push(c);
-  }
-
-  // p-value
-  const pval = (1 + permCorrs.filter(c => Math.abs(c) >= Math.abs(corrObs)).length) / (1 + M);
-
-  // Histogram
-  const nBins = 30;
-  const allVals = [...permCorrs, corrObs];
-  const minVal = Math.min(...allVals) - 0.02;
-  const maxVal = Math.max(...allVals) + 0.02;
-  const binWidth = (maxVal - minVal) / nBins;
-  const bins = new Array(nBins).fill(0);
-  permCorrs.forEach(c => {
-    const idx = Math.min(Math.floor((c - minVal) / binWidth), nBins - 1);
-    if (idx >= 0) bins[idx]++;
-  });
-
-  const labels = bins.map((_, i) => (minVal + (i + 0.5) * binWidth).toFixed(3));
-  const obsBin = Math.min(Math.floor((corrObs - minVal) / binWidth), nBins - 1);
-
-  const barColors = bins.map((_, i) => {
-    const center = minVal + (i + 0.5) * binWidth;
-    return Math.abs(center) >= Math.abs(corrObs) ? COLORS.redLight : COLORS.grayLight;
-  });
-
-  const ctx = document.getElementById('perm-canvas').getContext('2d');
-  if (permChart) permChart.destroy();
-  permChart = new Chart(ctx, {
-    type: 'bar',
-    data: {
-      labels,
-      datasets: [{
-        data: bins,
-        backgroundColor: barColors,
-        borderColor: 'rgba(0,0,0,0.06)',
-        borderWidth: 1,
-        borderRadius: 1,
-      }]
-    },
-    options: {
-      ...chartDefaults,
-      scales: {
-        x: { ...chartDefaults.scales.x, title: { display: true, text: 'Permutation correlation', font: { family: "'DM Sans'" } }, ticks: { maxTicksLimit: 8 } },
-        y: { ...chartDefaults.scales.y, title: { display: true, text: 'Count', font: { family: "'DM Sans'" } } }
-      }
-    }
-  });
-
-  document.getElementById('perm-results').innerHTML = `
-    <div class="stat-box" style="border-left:3px solid ${COLORS.blue};"><div class="stat-label">Observed r</div><div class="stat-value">${corrObs.toFixed(4)}</div></div>
-    <div class="stat-box" style="border-left:3px solid ${pval < 0.05 ? COLORS.red : COLORS.green};"><div class="stat-label">Permutation p-value</div><div class="stat-value">${pval.toFixed(4)}</div></div>
-    <div class="stat-box"><div class="stat-label">Formula</div><div class="stat-value" style="font-size:13px;">p = (1 + #{|T̃| ≥ |T|}) / (1 + M)</div></div>
-  `;
-}
-bindSlider('perm-n', drawPermutation);
-bindSlider('perm-rho', drawPermutation);
-bindSlider('perm-M', drawPermutation);
-document.getElementById('perm-resim').addEventListener('click', drawPermutation);
-drawPermutation();
-
-// ===================================================================
-// VIZ 7: CONFORMAL PREDICTION
-// ===================================================================
-let cpChart;
-function drawConformal() {
-  const n = +document.getElementById('cp-n').value;
-  const sigma = +document.getElementById('cp-noise').value;
-  const quality = +document.getElementById('cp-quality').value;
-  const alpha = +document.getElementById('cp-alpha').value;
-
-  // True function: f(x) = sin(2x) + 0.5x
-  const trueF = x => Math.sin(2 * x) + 0.5 * x;
-  // Model: mix of true function and random
-  const modelF = (x, q) => q * trueF(x) + (1 - q) * 0;
-
-  // Generate data
-  const nTrain = Math.floor(n * 0.5);
-  const nCal = n - nTrain;
-  const nTest = 40;
-
-  const allX = [], allY = [];
-  for (let i = 0; i < n; i++) {
-    const x = -3 + 6 * Math.random();
-    const y = trueF(x) + sigma * randn();
-    allX.push(x); allY.push(y);
-  }
-
-  // Split
-  const trainX = allX.slice(0, nTrain), trainY = allY.slice(0, nTrain);
-  const calX = allX.slice(nTrain), calY = allY.slice(nTrain);
-
-  // Calibration scores
-  const calScores = calX.map((x, i) => Math.abs(calY[i] - modelF(x, quality)));
-  calScores.sort((a, b) => a - b);
-
-  // Quantile
-  const qIdx = Math.min(Math.ceil((nCal + 1) * (1 - alpha)) - 1, nCal - 1);
-  const qhat = calScores[Math.max(0, qIdx)];
-
-  // Test points
-  const testX = [];
-  for (let i = 0; i < nTest; i++) testX.push(-3 + 6 * i / (nTest - 1));
-  const testPred = testX.map(x => modelF(x, quality));
-  const testTrue = testX.map(x => trueF(x) + sigma * randn());
-
-  // Coverage
-  const covered = testX.filter((x, i) => Math.abs(testTrue[i] - testPred[i]) <= qhat).length;
-  const covRate = covered / nTest;
-
-  const ctx = document.getElementById('cp-canvas').getContext('2d');
-  if (cpChart) cpChart.destroy();
-
-  cpChart = new Chart(ctx, {
-    type: 'scatter',
-    data: {
-      datasets: [
-        {
-          label: 'Prediction ± q̂ (upper)',
-          data: testX.map((x, i) => ({ x, y: testPred[i] + qhat })),
-          type: 'line',
-          borderColor: 'transparent',
-          backgroundColor: COLORS.blueLight,
-          fill: '+1',
-          pointRadius: 0,
-          tension: 0.3,
-        },
-        {
-          label: 'Prediction ± q̂ (lower)',
-          data: testX.map((x, i) => ({ x, y: testPred[i] - qhat })),
-          type: 'line',
-          borderColor: 'transparent',
-          backgroundColor: COLORS.blueLight,
-          fill: false,
-          pointRadius: 0,
-          tension: 0.3,
-        },
-        {
-          label: 'Model prediction',
-          data: testX.map((x, i) => ({ x, y: testPred[i] })),
-          type: 'line',
-          borderColor: COLORS.blue,
-          borderWidth: 2,
-          pointRadius: 0,
-          fill: false,
-          tension: 0.3,
-        },
-        {
-          label: 'Calibration data',
-          data: calX.map((x, i) => ({ x, y: calY[i] })),
-          backgroundColor: 'rgba(156,163,175,0.3)',
-          borderColor: 'rgba(156,163,175,0.5)',
-          pointRadius: 2.5,
-          borderWidth: 0.5,
-        },
-        {
-          label: 'Test outcomes',
-          data: testX.map((x, i) => ({ x, y: testTrue[i] })),
-          backgroundColor: testX.map((x, i) => Math.abs(testTrue[i] - testPred[i]) <= qhat ? COLORS.green : COLORS.red),
-          pointRadius: 5,
-          borderWidth: 1,
-          borderColor: 'white',
-        },
-      ]
-    },
-    options: {
-      ...chartDefaults,
-      plugins: {
-        legend: { display: true, position: 'top', labels: { font: { family: "'DM Sans'", size: 11 }, boxWidth: 12, filter: item => !item.text.includes('upper') && !item.text.includes('lower') } },
-        filler: { propagate: true }
-      },
-      scales: {
-        x: { ...chartDefaults.scales.x, title: { display: true, text: 'X', font: { family: "'DM Sans'" } } },
-        y: { ...chartDefaults.scales.y, title: { display: true, text: 'Y', font: { family: "'DM Sans'" } } }
-      }
-    }
-  });
-
-  document.getElementById('cp-results').innerHTML = `
-    <div class="stat-box" style="border-left:3px solid ${COLORS.blue};"><div class="stat-label">Interval half-width (q̂)</div><div class="stat-value">${qhat.toFixed(3)}</div></div>
-    <div class="stat-box" style="border-left:3px solid ${covRate >= (1 - alpha - 0.05) ? COLORS.green : COLORS.red};"><div class="stat-label">Empirical coverage</div><div class="stat-value">${(covRate * 100).toFixed(0)}% <span style="font-size:12px;color:var(--text-muted);">(target: ${((1 - alpha) * 100).toFixed(0)}%)</span></div></div>
-    <div class="stat-box"><div class="stat-label">Calibration pts</div><div class="stat-value">${nCal}</div></div>
-  `;
-}
-bindSlider('cp-n', drawConformal);
-bindSlider('cp-noise', drawConformal);
-bindSlider('cp-quality', drawConformal);
-bindSlider('cp-alpha', drawConformal);
-document.getElementById('cp-resim').addEventListener('click', drawConformal);
-drawConformal();
-
-// ===== Smooth scroll =====
-document.querySelectorAll('nav a[href^="#"]').forEach(a => {
-  a.addEventListener('click', e => {
-    e.preventDefault();
-    const target = document.querySelector(a.getAttribute('href'));
-    if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
-  });
-});
+// ===== MATH =====
+function randn(){let u=0,v=0;while(!u)u=Math.random();while(!v)v=Math.random();return Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*v)}
+function nCDF(x){const a1=.254829592,a2=-.284496736,a3=1.421413741,a4=-1.453152027,a5=1.061405429,p=.3275911,s=x<0?-1:1;x=Math.abs(x)/Math.SQRT2;const t=1/(1+p*x);return .5*(1+s*(1-(((((a5*t+a4)*t)+a3)*t+a2)*t+a1)*t*Math.exp(-x*x)))}
+function pval(z){return 2*(1-nCDF(Math.abs(z)))}
+function lgam(x){const c=[76.18009172947146,-86.50532032941677,24.01409824083091,-1.231739572450155,.1208650973866179e-2,-.5395239384953e-5];let y=x,t=x+5.5;t-=(x+.5)*Math.log(t);let s=1.000000000190015;for(let j=0;j<6;j++)s+=c[j]/++y;return-t+Math.log(2.5066282746310005*s/x)}
+function ginc(a,x){if(x<=0)return 0;if(x<a+1){let s=1/a,t=1/a;for(let n=1;n<200;n++){t*=x/(a+n);s+=t;if(Math.abs(t)<1e-10)break}return s*Math.exp(-x+a*Math.log(x)-lgam(a))}let f=1,c=1,d=1/(x+1-a);f=d;for(let n=1;n<200;n++){const an=n*(a-n),bn=x+2*n+1-a;d=1/(bn+an*d);c=bn+an/c;f*=c*d;if(Math.abs(c*d-1)<1e-10)break}return 1-f*Math.exp(-x+a*Math.log(x)-lgam(a))}
+function chi2CDF(x,k){return x<=0?0:ginc(k/2,x/2)}
+function genP(m,pi0,mu){const p=[],n=[];for(let i=0;i<m;i++){const t=Math.random()<pi0;n.push(t);p.push(pval(t?randn():randn()+mu))}return{p,n}}
+function B(id,cb){const e=document.getElementById(id),v=document.getElementById(id+'-v');e.addEventListener('input',()=>{v.textContent=e.value;if(cb)cb()});return e}
+function S(l,v,c){return`<div class="sb"${c?` style="border-left:3px solid ${c}"`:``}><div class="sl2">${l}</div><div class="sv">${v}</div></div>`}
+ 
+// Chart.js defaults — maintainAspectRatio:false with container height = proper sizing
+const D={responsive:true,maintainAspectRatio:false,animation:{duration:200},plugins:{legend:{display:false},tooltip:{bodyFont:{family:"'DM Sans'"},titleFont:{family:"'DM Sans'"}}},scales:{x:{grid:{color:'rgba(0,0,0,.04)'},ticks:{font:{family:"'DM Sans'",size:11}},border:{color:'rgba(0,0,0,.08)'}},y:{grid:{color:'rgba(0,0,0,.04)'},ticks:{font:{family:"'DM Sans'",size:11}},border:{color:'rgba(0,0,0,.08)'}}}};
+const CL={b:'#2563EB',bl:'rgba(37,99,235,.15)',r:'#DC2626',rl:'rgba(220,38,38,.15)',g:'#16A34A',gl:'rgba(22,163,74,.15)',a:'#D97706',al:'rgba(217,119,6,.15)',p:'#7C3AED',gr:'#9CA3AF',grl:'rgba(156,163,175,.12)'};
+ 
+// ===== 1: P-VALUE HIST =====
+let ch1;function d1(){
+const m=+document.getElementById('s1-m').value,pi0=1-document.getElementById('s1-pi').value,mu=+document.getElementById('s1-mu').value;
+const{p:ps}=genP(m,pi0,mu);const nB=20,bins=Array(nB).fill(0);
+ps.forEach(p=>{bins[Math.min(Math.floor(p*nB),nB-1)]++});
+const dens=bins.map(b=>b/m*nB);const ctx=document.getElementById('c1');
+if(ch1)ch1.destroy();
+ch1=new Chart(ctx,{type:'bar',data:{labels:bins.map((_,i)=>((i+.5)/nB).toFixed(2)),datasets:[{data:dens,backgroundColor:bins.map((_,i)=>(i+.5)/nB<.05?CL.bl:CL.grl),borderColor:bins.map((_,i)=>(i+.5)/nB<.05?CL.b:'rgba(0,0,0,.08)'),borderWidth:1,borderRadius:2,barPercentage:.92}]},options:{...D,scales:{x:{...D.scales.x,title:{display:true,text:'p-value',font:{family:"'DM Sans'"}}},y:{...D.scales.y,title:{display:true,text:'Density',font:{family:"'DM Sans'"}},suggestedMax:Math.max(2,...dens)*1.15}}}});
+const b5=ps.filter(p=>p<.05).length;
+document.getElementById('r1').innerHTML=S('p < 0.05',`${b5} / ${m}`,CL.b)+S('Expected',Math.round(m*.05))+S('Excess',`${b5-Math.round(m*.05)>0?'+':''}${b5-Math.round(m*.05)}`,b5>m*.08?CL.r:CL.g)}
+B('s1-m',d1);B('s1-pi',d1);B('s1-mu',d1);d1();
+ 
+// ===== 2: GLOBAL NULL =====
+let ch2;function d2(){
+const m=+document.getElementById('s2-m').value,pr=+document.getElementById('s2-p').value,mu=+document.getElementById('s2-mu').value,al=+document.getElementById('s2-a').value;
+const{p:ps}=genP(m,1-pr,mu);const so=[...ps].sort((a,b)=>a-b);
+const bR=Math.min(...ps)<=al/m;
+const fS=-2*ps.reduce((s,p)=>s+Math.log(Math.max(p,1e-300)),0);const fR=(1-chi2CDF(fS,2*m))<=al;
+let sR=false;for(let k=0;k<m;k++)if(so[k]<=al*(k+1)/m){sR=true;break}
+const ctx=document.getElementById('c2');if(ch2)ch2.destroy();
+const sN=Math.min(m,Math.max(10,Math.ceil(m*.6)));
+ch2=new Chart(ctx,{type:'scatter',data:{datasets:[
+{label:'p-values',data:so.slice(0,sN).map((p,i)=>({x:i+1,y:p})),backgroundColor:CL.grl,borderColor:CL.gr,borderWidth:.5,pointRadius:Math.max(2.5,Math.min(5,120/m))},
+{label:'Bonf. α/m',data:[{x:1,y:al/m},{x:sN,y:al/m}],type:'line',borderColor:CL.r,borderWidth:1.5,borderDash:[6,3],pointRadius:0,fill:false},
+{label:'Simes αk/m',data:Array.from({length:sN},(_,k)=>({x:k+1,y:al*(k+1)/m})),type:'line',borderColor:CL.p,borderWidth:1.5,pointRadius:0,fill:false}
+]},options:{...D,plugins:{...D.plugins,legend:{display:true,position:'top',labels:{font:{family:"'DM Sans'",size:11},boxWidth:12,padding:10}}},scales:{x:{...D.scales.x,title:{display:true,text:'Rank k',font:{family:"'DM Sans'"}}},y:{...D.scales.y,title:{display:true,text:'p-value',font:{family:"'DM Sans'"}},min:0}}}});
+const mk=(n,r,c)=>S(n,r?'REJECT':'Fail to reject',c);
+document.getElementById('r2').innerHTML=mk('Bonferroni',bR,CL.r)+mk('Fisher',fR,CL.a)+mk('Simes',sR,CL.p)}
+B('s2-m',d2);B('s2-p',d2);B('s2-mu',d2);B('s2-a',d2);document.getElementById('s2-b').onclick=d2;d2();
+ 
+// ===== 3: BH vs HOLM =====
+let ch3;function d3(){
+const m=+document.getElementById('s3-m').value,pi0=1-document.getElementById('s3-p').value,mu=+document.getElementById('s3-mu').value,al=+document.getElementById('s3-a').value;
+const{p:ps,n:ns}=genP(m,pi0,mu);const ix=ps.map((p,i)=>({p,n:ns[i]})).sort((a,b)=>a.p-b.p);
+let bK=0;for(let k=m;k>=1;k--)if(ix[k-1].p<=al*k/m){bK=k;break}
+let hK=0;for(let k=0;k<m;k++){if(ix[k].p<=al/(m-k))hK=k+1;else break}
+const ctx=document.getElementById('c3');if(ch3)ch3.destroy();
+const sN=Math.min(m,Math.max(bK+5,hK+5,Math.ceil(m*.5)));
+ch3=new Chart(ctx,{type:'scatter',data:{datasets:[
+{label:'p-values',data:ix.slice(0,sN).map((d,k)=>({x:k+1,y:d.p})),backgroundColor:ix.slice(0,sN).map(d=>d.n?'rgba(220,38,38,.3)':CL.g),pointRadius:Math.max(3,Math.min(6,180/m)),borderWidth:0},
+{label:'BH',data:Array.from({length:sN},(_,k)=>({x:k+1,y:al*(k+1)/m})),type:'line',borderColor:CL.b,borderWidth:2,pointRadius:0,fill:false},
+{label:'Holm',data:Array.from({length:sN},(_,k)=>({x:k+1,y:al/(m-k)})),type:'line',borderColor:CL.a,borderWidth:2,borderDash:[5,3],pointRadius:0,fill:false}
+]},options:{...D,scales:{x:{...D.scales.x,title:{display:true,text:'Rank k',font:{family:"'DM Sans'"}}},y:{...D.scales.y,title:{display:true,text:'p-value',font:{family:"'DM Sans'"}},min:0}}}});
+const bF=ix.slice(0,bK).filter(d=>d.n).length,bT=bK-bF,hF=ix.slice(0,hK).filter(d=>d.n).length,hT=hK-hF;
+document.getElementById('r3').innerHTML=
+S('BH',`${bK} <span style="font-size:12px;color:var(--text-mut)">(${bT}✓ ${bF}✗)</span>`,CL.b)+
+S('Holm',`${hK} <span style="font-size:12px;color:var(--text-mut)">(${hT}✓ ${hF}✗)</span>`,CL.a)+
+S('True signals',`${ns.filter(x=>!x).length}/${m}`)+
+S('BH FDP',bK>0?(bF/bK).toFixed(3):'—')}
+B('s3-m',d3);B('s3-p',d3);B('s3-mu',d3);B('s3-a',d3);document.getElementById('s3-b').onclick=d3;d3();
+ 
+// ===== 4: MONTE CARLO (deferred) =====
+let ch4;function d4(){
+const pi0=1-document.getElementById('s4-p').value,mu=+document.getElementById('s4-mu').value,al=.10;
+const ms=[10,20,50,100,200,500],nR=80,bhT=[],holmT=[],bonfT=[],bhF=[];
+for(const m of ms){let bt=0,bf=0,ht=0,bnt=0;
+for(let r=0;r<nR;r++){const{p:ps,n:ns}=genP(m,pi0,mu);const ix=ps.map((p,i)=>({p,n:ns[i]})).sort((a,b)=>a.p-b.p);
+let bk=0;for(let k=m;k>=1;k--)if(ix[k-1].p<=al*k/m){bk=k;break}
+bt+=ix.slice(0,bk).filter(d=>!d.n).length;bf+=ix.slice(0,bk).filter(d=>d.n).length;
+let hk=0;for(let k=0;k<m;k++){if(ix[k].p<=al/(m-k))hk=k+1;else break}
+ht+=ix.slice(0,hk).filter(d=>!d.n).length;
+bnt+=ps.map((p,i)=>({p,n:ns[i]})).filter(d=>d.p<=al/m&&!d.n).length}
+bhT.push(bt/nR);bhF.push(bf/nR);holmT.push(ht/nR);bonfT.push(bnt/nR)}
+const ctx=document.getElementById('c4');if(ch4)ch4.destroy();
+ch4=new Chart(ctx,{type:'line',data:{labels:ms,datasets:[
+{label:'BH true',data:bhT,borderColor:CL.b,borderWidth:2.5,pointRadius:4,fill:false,tension:.3},
+{label:'Holm true',data:holmT,borderColor:CL.a,borderWidth:2.5,pointRadius:4,fill:false,tension:.3},
+{label:'Bonf. true',data:bonfT,borderColor:CL.r,borderWidth:2,pointRadius:4,borderDash:[5,3],fill:false,tension:.3},
+{label:'BH false',data:bhF,borderColor:CL.b,borderWidth:1.5,pointRadius:3,borderDash:[2,2],fill:false,tension:.3}
+]},options:{...D,plugins:{...D.plugins,legend:{display:true,position:'top',labels:{font:{family:"'DM Sans'",size:11},boxWidth:12,padding:10}}},scales:{x:{...D.scales.x,type:'logarithmic',title:{display:true,text:'m',font:{family:"'DM Sans'"}}},y:{...D.scales.y,title:{display:true,text:'Avg discoveries',font:{family:"'DM Sans'"}},beginAtZero:true}}}})}
+B('s4-p',()=>{});B('s4-mu',()=>{});document.getElementById('s4-b').onclick=d4;
+ 
+// ===== 5: STOREY =====
+let ch5;function d5(){
+const m=+document.getElementById('s5-m').value,tPi=+document.getElementById('s5-pi').value,mu=+document.getElementById('s5-mu').value,gam=+document.getElementById('s5-g').value;
+const{p:ps}=genP(m,tPi,mu);const nB=25,bins=Array(nB).fill(0);
+ps.forEach(p=>{bins[Math.min(Math.floor(p*nB),nB-1)]++});const dens=bins.map(b=>b/m*nB);
+const aG=ps.filter(p=>p>gam).length,piH=Math.min(1.5,(1+aG)/(m*(1-gam)));
+const al=.10,so=[...ps].sort((a,b)=>a-b);
+let bK=0;for(let k=m;k>=1;k--)if(so[k-1]<=al*k/m){bK=k;break}
+let aK=0;const adj=Math.min(al/Math.min(piH,1),1);for(let k=m;k>=1;k--)if(so[k-1]<=adj*k/m){aK=k;break}
+const ctx=document.getElementById('c5');if(ch5)ch5.destroy();
+ch5=new Chart(ctx,{type:'bar',data:{labels:bins.map((_,i)=>((i+.5)/nB).toFixed(2)),datasets:[{data:dens,backgroundColor:bins.map((_,i)=>(i+1)/nB>gam?CL.al:CL.bl),borderColor:bins.map((_,i)=>(i+1)/nB>gam?CL.a:CL.b),borderWidth:1,borderRadius:2,barPercentage:.92}]},options:{...D,scales:{x:{...D.scales.x,title:{display:true,text:'p-value',font:{family:"'DM Sans'"}}},y:{...D.scales.y,title:{display:true,text:'Density',font:{family:"'DM Sans'"}},suggestedMax:Math.max(2,...dens)*1.15}}}});
+document.getElementById('r5').innerHTML=S('True π₀',tPi.toFixed(2))+S('π̂₀(γ)',piH.toFixed(3),CL.a)+S('BH disc.',bK,CL.b)+S('Adaptive',aK,CL.g)+S('Gain','+'+(aK-bK),aK>bK?CL.g:null)}
+B('s5-m',d5);B('s5-pi',d5);B('s5-mu',d5);B('s5-g',d5);document.getElementById('s5-b').onclick=d5;d5();
+ 
+// ===== 6: PERMUTATION =====
+let ch6;function d6(){
+const n=+document.getElementById('s6-n').value,rho=+document.getElementById('s6-r').value,M=+document.getElementById('s6-M').value;
+const X=[],Y=[];for(let i=0;i<n;i++){const x=randn();X.push(x);Y.push(rho*x+Math.sqrt(1-rho*rho)*randn())}
+const mx=X.reduce((s,v)=>s+v,0)/n,my=Y.reduce((s,v)=>s+v,0)/n;
+const sxx=X.reduce((s,v)=>s+(v-mx)**2,0),syy=Y.reduce((s,v)=>s+(v-my)**2,0);
+const rO=X.reduce((s,v,i)=>s+(v-mx)*(Y[i]-my),0)/Math.sqrt(sxx*syy);
+const perms=[];for(let b=0;b<M;b++){const p=[...Array(n).keys()];for(let i=n-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[p[i],p[j]]=[p[j],p[i]]}perms.push(p.reduce((s,pi,i)=>s+(X[pi]-mx)*(Y[i]-my),0)/Math.sqrt(sxx*syy))}
+const pv=(1+perms.filter(c=>Math.abs(c)>=Math.abs(rO)).length)/(1+M);
+const nB=30,lo=Math.min(...perms)-.02,hi=Math.max(...perms)+.02,bw=(hi-lo)/nB;
+const bins=Array(nB).fill(0);perms.forEach(c=>{const i=Math.min(Math.floor((c-lo)/bw),nB-1);if(i>=0)bins[i]++});
+const ctx=document.getElementById('c6');if(ch6)ch6.destroy();
+ch6=new Chart(ctx,{type:'bar',data:{labels:bins.map((_,i)=>(lo+(i+.5)*bw).toFixed(3)),datasets:[{data:bins,backgroundColor:bins.map((_,i)=>Math.abs(lo+(i+.5)*bw)>=Math.abs(rO)?CL.rl:CL.grl),borderColor:'rgba(0,0,0,.06)',borderWidth:1,borderRadius:1,barPercentage:.95}]},options:{...D,scales:{x:{...D.scales.x,title:{display:true,text:'Permutation correlation',font:{family:"'DM Sans'"}},ticks:{maxTicksLimit:7}},y:{...D.scales.y,title:{display:true,text:'Count',font:{family:"'DM Sans'"}}}}}});
+document.getElementById('r6').innerHTML=S('Observed r',rO.toFixed(4),CL.b)+S('p-value',pv.toFixed(4),pv<.05?CL.r:CL.g)+S('Formula','(1+#{|T̃|≥|T|})/(1+M)')}
+B('s6-n',d6);B('s6-r',d6);B('s6-M',d6);document.getElementById('s6-b').onclick=d6;d6();
+ 
+// ===== 7: CONFORMAL =====
+let ch7;function d7(){
+const n=+document.getElementById('s7-n').value,sig=+document.getElementById('s7-s').value,q=+document.getElementById('s7-q').value,al=+document.getElementById('s7-a').value;
+const tF=x=>Math.sin(2*x)+.5*x,mF=(x,q)=>q*tF(x);
+const nTr=Math.floor(n*.5),nCal=n-nTr,nTe=35;
+const aX=[],aY=[];for(let i=0;i<n;i++){const x=-3+6*Math.random();aX.push(x);aY.push(tF(x)+sig*randn())}
+const cX=aX.slice(nTr),cY=aY.slice(nTr);
+const sc=cX.map((x,i)=>Math.abs(cY[i]-mF(x,q))).sort((a,b)=>a-b);
+const qI=Math.min(Math.ceil((nCal+1)*(1-al))-1,nCal-1),qh=sc[Math.max(0,qI)];
+const tX=Array.from({length:nTe},(_,i)=>-3+6*i/(nTe-1));
+const tP=tX.map(x=>mF(x,q)),tT=tX.map(x=>tF(x)+sig*randn());
+const cov=tX.filter((_,i)=>Math.abs(tT[i]-tP[i])<=qh).length;
+const ctx=document.getElementById('c7');if(ch7)ch7.destroy();
+ch7=new Chart(ctx,{type:'scatter',data:{datasets:[
+{label:'Upper',data:tX.map((x,i)=>({x,y:tP[i]+qh})),type:'line',borderColor:'transparent',backgroundColor:CL.bl,fill:'+1',pointRadius:0,tension:.3},
+{label:'Lower',data:tX.map((x,i)=>({x,y:tP[i]-qh})),type:'line',borderColor:'transparent',fill:false,pointRadius:0,tension:.3},
+{label:'f̂(x)',data:tX.map((x,i)=>({x,y:tP[i]})),type:'line',borderColor:CL.b,borderWidth:2,pointRadius:0,fill:false,tension:.3},
+{label:'Cal. data',data:cX.map((x,i)=>({x,y:cY[i]})),backgroundColor:'rgba(156,163,175,.25)',pointRadius:2,borderWidth:0},
+{label:'Test',data:tX.map((x,i)=>({x,y:tT[i]})),backgroundColor:tX.map((_,i)=>Math.abs(tT[i]-tP[i])<=qh?CL.g:CL.r),pointRadius:5,borderWidth:1.5,borderColor:'white'}
+]},options:{...D,plugins:{...D.plugins,legend:{display:true,position:'top',labels:{font:{family:"'DM Sans'",size:11},boxWidth:12,filter:it=>!it.text.includes('pper')&&!it.text.includes('ower')}}},scales:{x:{...D.scales.x,title:{display:true,text:'X',font:{family:"'DM Sans'"}}},y:{...D.scales.y,title:{display:true,text:'Y',font:{family:"'DM Sans'"}}}}}});
+document.getElementById('r7').innerHTML=S('±q̂',qh.toFixed(3),CL.b)+S('Coverage',`${(cov/nTe*100).toFixed(0)}% <span style="font-size:12px;color:var(--text-mut)">target ${((1-al)*100).toFixed(0)}%</span>`,cov/nTe>=(1-al-.05)?CL.g:CL.r)+S('Cal. n',nCal)}
+B('s7-n',d7);B('s7-s',d7);B('s7-q',d7);B('s7-a',d7);document.getElementById('s7-b').onclick=d7;d7();
+ 
+// ===== NAV SCROLL =====
+document.querySelectorAll('nav a[href^="#"]').forEach(a=>{a.addEventListener('click',e=>{e.preventDefault();const t=document.querySelector(a.getAttribute('href'));if(t)t.scrollIntoView({behavior:'smooth',block:'start'})})});
+ 
+// ===== KATEX =====
+function tryKatex(){if(typeof renderMathInElement==='function'){renderMathInElement(document.body,{delimiters:[{left:'$$',right:'$$',display:true},{left:'\\(',right:'\\)',display:false}],throwOnError:false})}else{setTimeout(tryKatex,150)}}
+tryKatex();
 </script>
 </body>
 </html>
